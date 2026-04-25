@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Factories_And_Guns
 {
-    internal class Matrix
+    internal class MatrixCamera
     {
-        static public double WorldPosX { get; set; } = 0;
+        static public double WorldPosX { get; set; } = 0; // Координаты камеры
         static public double WorldPosY { get; set; } = 0;
         static public double SizeX { get; set; } = 60; // Кол-во блоков, которых нужно отрисовать по X
         static public double SizeY { get; set; } = 30; // Кол-во блоков, которых нужно отрисовать по Y
@@ -17,10 +17,14 @@ namespace Factories_And_Guns
         static public void RenderMatrix()
         {
             StaticSize = GameWindow.ClientBounds.Width / SizeX; // Установка масштаба объектов с учётом кол-ва блоков, которых нужно отрисовать по X ( ширина_окна_в_пикселях / кол-во_блоков.по_X )
+            //int n = GameWindow.ClientBounds.Width / GameWindow.ClientBounds.Height;
 
-            for (int i = 0; i < SizeX; i++)
+            double X2 = SizeX / 2;
+            double Y2 = SizeY / 2;
+
+            for (int i = -(int)X2; i < X2; i++)
             {
-                for (int j = 0; j < SizeY; j++)
+                for (int j = -(int)Y2; j < Y2; j++)
                 {
                     if (
                         j + (int)WorldPosY >= 0 &&
@@ -32,8 +36,8 @@ namespace Factories_And_Guns
                         double nX = WorldPosX * StaticSize % StaticSize; // Получение дробного числа ( дробные.координаты * размер.объекта % размер.объекта )
                         double nY = WorldPosY * StaticSize % StaticSize;
                         Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
-                            i * (int)StaticSize - (int)nX, // Координата X ( индекс * (int)размер.объекта - (int)дробное.число )
-                            j * (int)StaticSize - (int)nY, // Координата Y
+                            (int)((i + X2) * StaticSize - nX), // Координата X ( индекс * (int)размер.объекта - (int)дробное.число )
+                            (int)((j + Y2) * StaticSize - nY), // Координата Y
                             (int)StaticSize,  // Ширина в пикселях
                             (int)StaticSize   // Высота в пикселях
                         );

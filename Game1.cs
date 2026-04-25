@@ -1,6 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection.Metadata;
 
 namespace Factories_And_Guns
 {
@@ -26,10 +31,9 @@ namespace Factories_And_Guns
             // НАЗНАЧЕНИЕ: Здесь настраиваются неграфические объекты (переменные, логика).
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             OpenSource.GraphicsDevice = GraphicsDevice;
-            Field = new("New field", 100, 100);
-            Matrix.Field = Field;
-            Matrix.SpriteBatch = SpriteBatch;
-            Matrix.GameWindow = Window;
+
+            MatrixCamera.SpriteBatch = SpriteBatch;
+            MatrixCamera.GameWindow = Window;
 
             base.Initialize();
         }
@@ -45,8 +49,13 @@ namespace Factories_And_Guns
             //       Texture2D Block_texture = Content.Load<Texture2D>("Block/point");
 
             // НАЗНАЧЕНИЕ: Использовать this.Content.Load< >( ) для загрузки контента в переменную и т.п.
+            //             Примечание: такой метод, в отличие от OpenSource.OpenPng(), тратит НАМНОГО МЕНЬШЕ оперативной памяти,
+            //                         потому что текстуры загружены заранее, и хранятся не в коде, а в Content.
 
-            Content.Load<Texture2D>("Block/point"); // Расширение не писать
+            ContentMaster.LoadTexture(Content); // Загружаем текстуры.
+
+            Field = new("New field", 100, 100); // Создаём поле после того, как загрузим текстуры.
+            MatrixCamera.Field = Field;
         }
 
         protected override void Update(GameTime gameTime)
@@ -54,26 +63,26 @@ namespace Factories_And_Guns
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // НАЗНАЧЕНИЕ: Внутренняя логика
+            // НАЗНАЧЕНИЕ: Внутренняя логика.
 
             var key = Keyboard.GetState();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (key.IsKeyDown(Keys.W)) Matrix.WorldPosY -= CameraSpeed * dt;
-            if (key.IsKeyDown(Keys.S)) Matrix.WorldPosY += CameraSpeed * dt;
-            if (key.IsKeyDown(Keys.A)) Matrix.WorldPosX -= CameraSpeed * dt;
-            if (key.IsKeyDown(Keys.D)) Matrix.WorldPosX += CameraSpeed * dt;
+            if (key.IsKeyDown(Keys.W)) MatrixCamera.WorldPosY -= CameraSpeed * dt;
+            if (key.IsKeyDown(Keys.S)) MatrixCamera.WorldPosY += CameraSpeed * dt;
+            if (key.IsKeyDown(Keys.A)) MatrixCamera.WorldPosX -= CameraSpeed * dt;
+            if (key.IsKeyDown(Keys.D)) MatrixCamera.WorldPosX += CameraSpeed * dt;
 
-            if (key.IsKeyDown(Keys.Up) && Matrix.SizeY < 60)
+            if (key.IsKeyDown(Keys.Up) && MatrixCamera.SizeY < 60)
             {
-                Matrix.SizeY *= 1.1f;
-                Matrix.SizeX *= 1.1f;
+                MatrixCamera.SizeY *= 1.1f;
+                MatrixCamera.SizeX *= 1.1f;
             }
-            if (key.IsKeyDown(Keys.Down) && Matrix.SizeY > 10)
+            if (key.IsKeyDown(Keys.Down) && MatrixCamera.SizeY > 10)
             {
-                Matrix.SizeY /= 1.1f;
-                Matrix.SizeX /= 1.1f;
+                MatrixCamera.SizeY /= 1.1f;
+                MatrixCamera.SizeX /= 1.1f;
             }
 
             base.Update(gameTime);
@@ -83,11 +92,11 @@ namespace Factories_And_Guns
         {
             GraphicsDevice.Clear(Color.Black);
 
-            // НАЗНАЧЕНИЕ: Отрисовка
+            // НАЗНАЧЕНИЕ: Отрисовка.
 
-            SpriteBatch.Begin(samplerState: SamplerState.PointClamp); // PointClamp - без сглаживания текстур (по-пиксельная отрисовка)
+            SpriteBatch.Begin(samplerState: SamplerState.PointClamp); // PointClamp - без сглаживания текстур (по-пиксельная отрисовка).
 
-            Matrix.RenderMatrix();
+            MatrixCamera.RenderMatrix();
 
             SpriteBatch.End();
 
