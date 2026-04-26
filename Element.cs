@@ -7,7 +7,7 @@ namespace Factories_And_Guns
     {
         public string Name { get; set; } = name;
         public Texture2D Texture { get; set; } = texture;
-        public int WorldX { get; set; } = X;
-        public int WorldY { get; set; } = Y;
+        public double WorldX { get; set; } = X;
+        public double WorldY { get; set; } = Y;
     }
 }

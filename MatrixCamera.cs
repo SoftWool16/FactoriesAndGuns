@@ -17,12 +17,12 @@ namespace Factories_And_Guns
         static public void RenderMatrix()
         {
             StaticSize = GameWindow.ClientBounds.Width / SizeX; // Установка масштаба объектов с учётом кол-ва блоков, которых нужно отрисовать по X ( ширина_окна_в_пикселях / кол-во_блоков.по_X )
-            //int n = GameWindow.ClientBounds.Width / GameWindow.ClientBounds.Height;
+            SizeY = GameWindow.ClientBounds.Height / StaticSize;
 
             double X2 = SizeX / 2;
             double Y2 = SizeY / 2;
 
-            for (int i = -(int)X2; i < X2; i++)
+            for (int i = -(int)X2; i < X2; i++) // Отрисовка фона
             {
                 for (int j = -(int)Y2; j < Y2; j++)
                 {
@@ -36,17 +36,41 @@ namespace Factories_And_Guns
                         double nX = WorldPosX * StaticSize % StaticSize; // Получение дробного числа ( дробные.координаты * размер.объекта % размер.объекта )
                         double nY = WorldPosY * StaticSize % StaticSize;
                         Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
-                            (int)((i + X2) * StaticSize - nX), // Координата X ( индекс * (int)размер.объекта - (int)дробное.число )
+                            (int)((i + X2) * StaticSize - nX), // Координата X ( (int)((индекс.поX + половина.масштабаX) * размер.объекта - дробное.число) )
                             (int)((j + Y2) * StaticSize - nY), // Координата Y
                             (int)StaticSize,  // Ширина в пикселях
                             (int)StaticSize   // Высота в пикселях
                         );
                         SpriteBatch.Draw(
-                            Field.Fields[j + (int)WorldPosY, i + (int)WorldPosX].Texture,
+                            Field.FieldBackground[j + (int)WorldPosY, i + (int)WorldPosX].Texture,
                             destinationRectangle,
                             Color.Gray
                         );
                     }
+                }
+            }
+
+            var list = Field.FieldTankBody.Keys;
+            foreach (string name in list) // Отрисовка тела техники
+            {
+                if (
+                    Field.FieldTankBody[name].WorldX >= WorldPosX - X2 &&
+                    Field.FieldTankBody[name].WorldX <= WorldPosX + X2 &&
+                    Field.FieldTankBody[name].WorldY >= WorldPosY - X2 &&
+                    Field.FieldTankBody[name].WorldY <= WorldPosY + Y2
+                )
+                {
+                    Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
+                        (int)((Field.FieldTankBody[name].WorldX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
+                        (int)((Field.FieldTankBody[name].WorldY - WorldPosY + Y2) * StaticSize), // Координата Y
+                        (int)StaticSize,  // Ширина в пикселях
+                        (int)StaticSize   // Высота в пикселях
+                    );
+                    SpriteBatch.Draw(
+                        Field.FieldTankBody[name].Texture,
+                        destinationRectangle,
+                        Color.Gray
+                    );
                 }
             }
         }
