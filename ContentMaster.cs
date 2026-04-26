@@ -8,7 +8,7 @@ namespace Factories_And_Guns
 {
     internal class ContentMaster
     {
-        public static Dictionary<string, Texture2D> Textures = [];
+        public static Dictionary<string, Dictionary<string, Texture2D>> Textures = [];
 
         public static void LoadTexture(ContentManager content)
         {
@@ -26,10 +26,17 @@ namespace Factories_And_Guns
 
                 assetName = assetName.Replace('\\', '/');                           // 3️. Меняем обратные слеши на прямые – так требует ContentManager.
 
+                string path = Path.GetDirectoryName(assetName)?.Replace('\\', '/') ?? ""; // Path.GetDirectoryName вернет папку (например, "Characters/Enemies") или пустую строку для корня
+
+                if (!Textures.ContainsKey(path))
+                {
+                    Textures[path] = [];
+                }
+
                 // 4️. Загружаем текстуру и сохраняем по названию.
                 try
                 {
-                    Textures[Path.GetFileName(assetName)] = content.Load<Texture2D>(assetName);
+                    Textures[path][Path.GetFileName(assetName)] = content.Load<Texture2D>(assetName);
                 }
                 catch (ContentLoadException)
                 {
