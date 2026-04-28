@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace Factories_And_Guns
@@ -8,8 +9,7 @@ namespace Factories_And_Guns
 
         public Element[,] FieldBackground;                      // Слой 1 - фоновый.
         //public Element[,] FieldBuild;                           // Слой 2 - постройки.
-        public Dictionary<string, Dictionary<string, Element>> FieldGround = [];    // Слой 3 - наземная техника.
-        //public Dictionary<string, Dictionary<string, Element>> FieldAir = [];       // Слой 4 - воздушная техника.
+        public Dictionary<string, BaseEquipment> FieldEquipment = [];    // Слой 3 - техника.
         public int SizeX { get; set; }
         public int SizeY { get; set; }
 
@@ -32,14 +32,19 @@ namespace Factories_And_Guns
             {
                 for (int j = 0; j < sizeX; j++)
                 {
-                    if (i == j) FieldBackground[i, j] = new Element("Point", j, i, ContentMaster.Textures["Block"]["point"]);
-                    else if (i % 10 == 0 && j % 10 == 0) FieldBackground[i, j] = new Element("Grass", j, i, ContentMaster.Textures["Block"]["grass"]);
-                    else FieldBackground[i, j] = new Element("Void", j, i, ContentMaster.Textures["Block"]["void"]);
+                    if (i == j) FieldBackground[i, j] = new Element("point", j, i, "Block");
+                    else if (i % 10 == 0 && j % 10 == 0) FieldBackground[i, j] = new Element("grass", j, i, "Block");
+                    else FieldBackground[i, j] = new Element("void", j, i, "Block");
                 }
             }
-            FieldGround["Beta1"] = [];
-            FieldGround["Beta1"]["body"] = new Element("TankBody", 5, 5, ContentMaster.Textures["Ground_Equipment/Beta"]["body"]);
-            FieldGround["Beta1"]["tower"] = new Element("TankTower", 5, 5, ContentMaster.Textures["Ground_Equipment/Beta"]["tower"]);
+
+            Dictionary<string, TextureGun> tower = []; 
+            tower["tower1"] = new TextureGun("tower", 0, 0);
+            FieldEquipment["beta1"] = new GroundEquipment(1, 1, 1, 1, "Beta", 1.5, 1.5, "Ground_Equipment/Beta", tower, 1, null, 2.5);
+
+            Dictionary<string, TextureEffect> effects = []; // Создание списка с эффектами
+            effects["effect1"] = new TextureEffect("propeller", 0, 0, 8.5, EffectType.rotation);
+            FieldEquipment["dragonfly1"] = new GroundEquipment(1, 0.6, 2, 2, "Dragonfly", 5.5, 5.5, "Air_Equipment/Dragonfly", null, 5, effects, 1);
         }
     }
 }

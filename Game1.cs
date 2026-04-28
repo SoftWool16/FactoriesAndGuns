@@ -85,6 +85,10 @@ namespace Factories_And_Guns
                 MatrixCamera.SizeX /= 1.1f;
             }
 
+            Field.FieldEquipment["beta1"].Rotation += CameraSpeed / 5 * dt;
+
+            Field.FieldEquipment["dragonfly1"].Rotation += CameraSpeed / 5 * dt;
+
             base.Update(gameTime);
         }
 
