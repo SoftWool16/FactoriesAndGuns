@@ -19,7 +19,11 @@ namespace Factories_And_Guns
         movement
     }
 
-    public struct TextureGun(string textureName, double offsetCenterX, double offsetCenterY)
+    public class TextureBullet()
+    {
+
+    }
+    public class TextureGun(string textureName, double offsetCenterX, double offsetCenterY)
     {
         public string TextureName { get; set; } = textureName;
         public double Rotation { get; set; } = 0;
@@ -27,7 +31,7 @@ namespace Factories_And_Guns
         public double OffsetY { get; set; } = offsetCenterY;
     }
 
-    public struct TextureEffect (string textureName, double offsetCenterX, double offsetCenterY, double speedEffect, EffectType effectType)
+    public class TextureEffect (string textureName, double offsetCenterX, double offsetCenterY, double speedEffect, EffectType effectType)
     {
         public string TextureName { get; set; } = textureName;
         public double SpeedEffect {  get; set; } = speedEffect;
@@ -35,6 +39,12 @@ namespace Factories_And_Guns
         public double Rotation { get; set; } = 0;
         public double OffsetX { get; set; } = offsetCenterX;
         public double OffsetY { get; set; } = offsetCenterY;
+        public void EffectUpdate(GameTime gameTime)
+        {
+            double dt = gameTime.ElapsedGameTime.TotalSeconds;
+            if (EffectType == EffectType.rotation) Rotation += SpeedEffect * dt;
+            //else if (EffectType == EffectType.shaking) 
+        }
     }
 
     internal class BaseEquipment(double offsetCenterX, double offsetCenterY, double sizeX, double sizeY, string name, double X, double Y, string textureBodyPath, Dictionary<string, TextureGun> Guns, Dictionary<string, TextureEffect> constantEffects, double maxSpeed, int max_height_to_be_overcome) : Element(name, X, Y, textureBodyPath)

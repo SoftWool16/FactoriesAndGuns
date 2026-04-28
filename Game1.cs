@@ -67,7 +67,7 @@ namespace Factories_And_Guns
 
             var key = Keyboard.GetState();
 
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            double dt = gameTime.ElapsedGameTime.TotalSeconds;
 
             if (key.IsKeyDown(Keys.W)) MatrixCamera.WorldPosY -= CameraSpeed * dt;
             if (key.IsKeyDown(Keys.S)) MatrixCamera.WorldPosY += CameraSpeed * dt;
@@ -83,6 +83,16 @@ namespace Factories_And_Guns
             {
                 MatrixCamera.SizeY /= 1.1f;
                 MatrixCamera.SizeX /= 1.1f;
+            }
+
+            var unitList = Field.FieldEquipment.Keys;
+            foreach (string name in unitList) // Обновление эффектов
+            {
+                if (Field.FieldEquipment[name].Effects != null)
+                {
+                    var unitEffectList = Field.FieldEquipment[name].Effects.Keys;
+                    foreach (var effect in unitEffectList) Field.FieldEquipment[name].Effects[effect].EffectUpdate(gameTime);
+                }
             }
 
             Field.FieldEquipment["beta1"].Rotation += CameraSpeed / 5 * dt;

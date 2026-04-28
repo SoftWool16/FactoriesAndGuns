@@ -57,79 +57,85 @@ namespace Factories_And_Guns
             var list = Field.FieldEquipment.Keys;
             foreach (string name in list) // Отрисовка техники
             {
+                var unit = Field.FieldEquipment[name];
                 if (
-                    Field.FieldEquipment[name].WorldX >= WorldPosX - X2 &&
-                    Field.FieldEquipment[name].WorldX <= WorldPosX + X2 &&
-                    Field.FieldEquipment[name].WorldY >= WorldPosY - Y2 &&
-                    Field.FieldEquipment[name].WorldY <= WorldPosY + Y2
+                    unit.WorldX >= WorldPosX - X2 &&
+                    unit.WorldX <= WorldPosX + X2 &&
+                    unit.WorldY >= WorldPosY - Y2 &&
+                    unit.WorldY <= WorldPosY + Y2
                 )
                 {
                     Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
-                        (int)((Field.FieldEquipment[name].WorldX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
-                        (int)((Field.FieldEquipment[name].WorldY - WorldPosY + Y2) * StaticSize), // Координата Y
-                        (int)(StaticSize * Field.FieldEquipment[name].FixedSizeX),  // Ширина в пикселях
-                        (int)(StaticSize * Field.FieldEquipment[name].FixedSizeY)   // Высота в пикселях
+                        (int)((unit.WorldX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
+                        (int)((unit.WorldY - WorldPosY + Y2) * StaticSize), // Координата Y
+                        (int)(StaticSize * unit.FixedSizeX),  // Ширина в пикселях
+                        (int)(StaticSize * unit.FixedSizeY)   // Высота в пикселях
                     );
                     SpriteBatch.Draw(
-                        ContentMaster.Textures[
-                            Field.FieldEquipment[name].TexturePath
-                            ]["body"],
+                        ContentMaster.Textures[unit.TexturePath]["body"],
                         destinationRectangle,
                         null,
                         Color.Gray,
-                        (float)Field.FieldEquipment[name].Rotation,
+                        (float)unit.Rotation,
                         new Vector2 (
-                            (float)(ContentMaster.Textures[Field.FieldEquipment[name].TexturePath]["body"].Width / 2 * Field.FieldEquipment[name].OffsetX),
-                            (float)(ContentMaster.Textures[Field.FieldEquipment[name].TexturePath]["body"].Height / 2 * Field.FieldEquipment[name].OffsetY)
-                            ),
+                            (float)(ContentMaster.Textures[unit.TexturePath]["body"].Width / 2 * unit.OffsetX),
+                            (float)(ContentMaster.Textures[unit.TexturePath]["body"].Height / 2 * unit.OffsetY)
+                            ),                                                                                       
                         SpriteEffects.None,
                         0
                     );
-                    //if (Field.FieldEquipment[name].Guns != null)
-                    //{
-                    //    var gunsList = Field.FieldEquipment[name].Guns.Keys;
-                    //    foreach (string nameGun in gunsList) // Отрисовка орудий ( если есть )
-                    //    {
-                    //        Rectangle destinationRectangleGuns = new( // 4-х угольник, на который будет надета текстура
-                    //        (int)((Field.FieldEquipment[name].WorldX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
-                    //        (int)((Field.FieldEquipment[name].WorldY - WorldPosY + Y2) * StaticSize), // Координата Y
-                    //        (int)(StaticSize * Field.FieldEquipment[name].FixedSizeX),  // Ширина в пикселях
-                    //        (int)(StaticSize * Field.FieldEquipment[name].FixedSizeY)   // Высота в пикселях
-                    //        );
-                    //        SpriteBatch.Draw(
-                    //            texture: Field.FieldEquipment[name].Guns[nameGun].Texture,
-                    //            position: new Vector2(
-                    //                (float)((Field.FieldEquipment[name].WorldX - WorldPosX + X2) * StaticSize),
-                    //                (float)((Field.FieldEquipment[name].WorldY - WorldPosY + Y2) * StaticSize)
-                    //                ),
-                    //            sourceRectangle: null,
-                    //            color: Color.Gray,
-                    //            rotation: (float)Field.FieldEquipment[name].Guns[nameGun].Rotation,
-                    //            origin: Field.FieldEquipment[name].CenterPos,
-                    //            (float)(StaticSize * Field.FieldEquipment[name].FixedSizeX),
-                    //            SpriteEffects.None,
-                    //            0f
-                    //        );
-                    //    }
-                    //}
-                    //if (Field.FieldEquipment[name].Effects != null)
-                    //{
-                    //    var effectList = Field.FieldEquipment[name].Effects.Keys;
-                    //    foreach (string nameEffect in effectList) // Отрисовка эффектов ( если есть )
-                    //    {
-                    //        Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
-                    //        (int)((Field.FieldEquipment[name].WorldX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
-                    //        (int)((Field.FieldEquipment[name].WorldY - WorldPosY + Y2) * StaticSize), // Координата Y
-                    //        (int)(StaticSize * Field.FieldEquipment[name].FixedSizeX),  // Ширина в пикселях
-                    //        (int)(StaticSize * Field.FieldEquipment[name].FixedSizeY)   // Высота в пикселях
-                    //    );
-                    //        SpriteBatch.Draw(
-                    //            Field.FieldEquipment[name].Effects[nameEffect].Texture,
-                    //            destinationRectangleEffects,
-                    //            Color.Gray
-                    //        );
-                    //    }
-                    //}
+                    if (unit.Guns != null)
+                    {
+                        var gunsList = unit.Guns.Keys;
+                        foreach (string nameGun in gunsList) // Отрисовка орудий ( если есть )
+                        {
+                            Rectangle destinationRectangleGuns = new( // 4-х угольник, на который будет надета текстура
+                            (int)((unit.WorldX + unit.Guns[nameGun].OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                            (int)((unit.WorldY + unit.Guns[nameGun].OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
+                            (int)(StaticSize * unit.FixedSizeX),  // Ширина в пикселях
+                            (int)(StaticSize * unit.FixedSizeY * 3.5)   // Высота в пикселях
+                            );
+                            SpriteBatch.Draw(
+                                ContentMaster.Textures[unit.TexturePath][unit.Guns[nameGun].TextureName],
+                                destinationRectangleGuns,
+                                null,
+                                Color.Gray,
+                                (float)unit.Guns[nameGun].Rotation,
+                                new Vector2(
+                                    ContentMaster.Textures[unit.TexturePath][unit.Guns[nameGun].TextureName].Width / 2,
+                                    ContentMaster.Textures[unit.TexturePath][unit.Guns[nameGun].TextureName].Height / 2
+                                    ),
+                                SpriteEffects.None,
+                                0
+                            );
+                        }
+                    }
+                    if (unit.Effects != null)
+                    {
+                        var effectList = unit.Effects.Keys;
+                        foreach (string nameEffect in effectList) // Отрисовка эффектов ( если есть )
+                        {
+                            Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
+                            (int)((unit.WorldX + unit.Effects[nameEffect].OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                            (int)((unit.WorldY + unit.Effects[nameEffect].OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
+                            (int)(StaticSize * unit.FixedSizeX),  // Ширина в пикселях
+                            (int)(StaticSize * unit.FixedSizeY)   // Высота в пикселях
+                        );
+                            SpriteBatch.Draw(
+                                ContentMaster.Textures[unit.TexturePath][unit.Effects[nameEffect].TextureName],
+                                destinationRectangleEffects,
+                                null,
+                                Color.Gray,
+                                (float)unit.Effects[nameEffect].Rotation,
+                                new Vector2(
+                                    ContentMaster.Textures[unit.TexturePath][unit.Effects[nameEffect].TextureName].Width / 2,
+                                    ContentMaster.Textures[unit.TexturePath][unit.Effects[nameEffect].TextureName].Height / 2
+                                    ),
+                                SpriteEffects.None,
+                                0
+                            );
+                        }
+                    }
                 }
             }
         }

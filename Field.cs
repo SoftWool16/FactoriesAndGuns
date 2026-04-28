@@ -38,13 +38,13 @@ namespace Factories_And_Guns
                 }
             }
 
-            Dictionary<string, TextureGun> tower = []; 
-            tower["tower1"] = new TextureGun("tower", 0, 0);
+            Dictionary<string, TextureGun> tower = [];
+            tower["tower1"] = new TextureGun("tower", 0, -1.5);
             FieldEquipment["beta1"] = new GroundEquipment(1, 1, 1, 1, "Beta", 1.5, 1.5, "Ground_Equipment/Beta", tower, 1, null, 2.5);
 
             Dictionary<string, TextureEffect> effects = []; // Создание списка с эффектами
-            effects["effect1"] = new TextureEffect("propeller", 0, 0, 8.5, EffectType.rotation);
-            FieldEquipment["dragonfly1"] = new GroundEquipment(1, 0.6, 2, 2, "Dragonfly", 5.5, 5.5, "Air_Equipment/Dragonfly", null, 5, effects, 1);
+            effects["effect1"] = new TextureEffect("propeller", 0, 0, 15, EffectType.rotation);
+            FieldEquipment["dragonfly1"] = new GroundEquipment(1, 0.6, 3, 3, "Dragonfly", 5.5, 5.5, "Air_Equipment/Dragonfly", null, 5, effects, 1);
         }
     }
 }
