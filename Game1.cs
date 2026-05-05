@@ -17,6 +17,8 @@ namespace Factories_And_Guns
         private GraphicsDeviceManager _graphics;
         private SpriteBatch SpriteBatch;
 
+        private GroundEquipment _gameEquipment;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -67,7 +69,7 @@ namespace Factories_And_Guns
 
             var key = Keyboard.GetState();
 
-            double dt = gameTime.ElapsedGameTime.TotalSeconds;
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (key.IsKeyDown(Keys.W)) MatrixCamera.WorldPosY -= CameraSpeed * dt;
             if (key.IsKeyDown(Keys.S)) MatrixCamera.WorldPosY += CameraSpeed * dt;
@@ -88,16 +90,29 @@ namespace Factories_And_Guns
             var unitList = Field.FieldEquipment.Keys;
             foreach (string name in unitList) // Обновление эффектов
             {
-                if (Field.FieldEquipment[name].Effects != null)
+                var effects = Field.FieldEquipment[name].Effects;
+                if (effects != null)
                 {
-                    var unitEffectList = Field.FieldEquipment[name].Effects.Keys;
-                    foreach (var effect in unitEffectList) Field.FieldEquipment[name].Effects[effect].EffectUpdate(gameTime);
+                    var unitEffectList = effects.Keys;
+                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(gameTime);
+                }
+            }
+
+            BaseFactory[,] buildList = Field.FieldBuild;
+            if (buildList != null)
+            {
+                for (int i = 0; i < Field.SizeY; i++)
+                {
+                    for (int j = 0; j < Field.SizeX; j++)
+                    {
+                        buildList[i, j]?.ConstantEffect?.EffectUpdate(gameTime);
+                    }
                 }
             }
 
             Field.FieldEquipment["beta1"].Rotation += CameraSpeed / 5 * dt;
 
-            Field.FieldEquipment["dragonfly1"].Rotation += CameraSpeed / 5 * dt;
+            Field.AirEquipment["dragonfly1"].Rotation += CameraSpeed / 5 * dt;
 
             base.Update(gameTime);
         }

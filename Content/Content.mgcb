@@ -37,6 +37,54 @@
 /processorParam:TextureFormat=Color
 /build:../../Desktop/модельки для MyMindustry/dragonfly (air)/propeller.png;Air_Equipment/Dragonfly/propeller.png
 
+#begin ../../Desktop/модельки для MyMindustry/блоки/grass.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Desktop/модельки для MyMindustry/блоки/grass.png;Block/grass.png
+
+#begin ../../Desktop/модельки для MyMindustry/блоки/sand.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Desktop/модельки для MyMindustry/блоки/sand.png;Block/sand.png
+
+#begin ../../Desktop/модельки для MyMindustry/блоки/water_effect.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Desktop/модельки для MyMindustry/блоки/water_effect.png;Block/water_effect.png
+
+#begin ../../Desktop/модельки для MyMindustry/блоки/water.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Desktop/модельки для MyMindustry/блоки/water.png;Block/water.png
+
 #begin Air_Equipment/Dragonfly/body.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -49,7 +97,7 @@
 /processorParam:TextureFormat=Color
 /build:Air_Equipment/Dragonfly/body.png
 
-#begin Block/grass.png
+#begin Block/shadow.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -59,9 +107,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Block/grass.png
+/build:Block/shadow.png
 
-#begin Block/point.png
+#begin Build/conveyors/body.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -71,9 +119,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Block/point.png
+/build:Build/conveyors/body.png
 
-#begin Block/void.png
+#begin Build/Elementary_drill/body.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -83,7 +131,19 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Block/void.png
+/build:Build/Elementary_drill/body.png
+
+#begin Build/Elementary_drill/drill.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Build/Elementary_drill/drill.png
 
 #begin Ground_Equipment/Beta/body.png
 /importer:TextureImporter

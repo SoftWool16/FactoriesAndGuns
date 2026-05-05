@@ -4,12 +4,10 @@ using System.Collections.Generic;
 
 namespace Factories_And_Guns
 {
-    internal class Element(string name, double X, double Y, string texturePath)
+    public class Element(string name, string texturePath)
     {
         public string Name { get; set; } = name;
         public string TexturePath { get; set; } = texturePath;
-        public double WorldX { get; set; } = X;
-        public double WorldY { get; set; } = Y;
     }
 
     public enum EffectType
@@ -19,54 +17,91 @@ namespace Factories_And_Guns
         movement
     }
 
-    public class TextureBullet()
-    {
-
-    }
-    public class TextureGun(string textureName, double offsetCenterX, double offsetCenterY)
+    public class Bullet(string textureName, float size)
     {
         public string TextureName { get; set; } = textureName;
-        public double Rotation { get; set; } = 0;
-        public double OffsetX { get; set; } = offsetCenterX;
-        public double OffsetY { get; set; } = offsetCenterY;
+        public float Rotation { get; set; } = 0;
+        public float WorldX { get; set; } = 0;
+        public float WorldY { get; set; } = 0;
+        public float Size { get; set; } = size;
+        public void BulletUpdate(GameTime gameTime)
+        {
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            
+        }
     }
-
-    public class TextureEffect (string textureName, double offsetCenterX, double offsetCenterY, double speedEffect, EffectType effectType)
+    public class Gun(string textureName, float offsetCenterX, float offsetCenterY, int damage, Bullet bullet, float rate_of_fire, float speedBullet, float speedRotation, float size)
     {
         public string TextureName { get; set; } = textureName;
-        public double SpeedEffect {  get; set; } = speedEffect;
+        public float Rotation { get; set; } = 0;
+        public float OffsetX { get; set; } = offsetCenterX;
+        public float OffsetY { get; set; } = offsetCenterY;
+        public int Damage { get; set; } = damage;
+        public Bullet Bullet { get; set; } = bullet;
+        public float Rate_of_fire { get; set; } = rate_of_fire;
+        public float SpeedBullet {get; set;} = speedBullet;
+        public float SpeedRotation { get; set;} = speedRotation;
+        public float Size { get; set; } = size;
+    }
+
+    public class Effect (string textureName, float offsetCenterX, float offsetCenterY, float speedEffect, EffectType effectType, float size)
+    {
+        public string TextureName { get; set; } = textureName;
+        public float SpeedEffect {  get; set; } = speedEffect;
         public EffectType EffectType { get; set; } = effectType;
-        public double Rotation { get; set; } = 0;
-        public double OffsetX { get; set; } = offsetCenterX;
-        public double OffsetY { get; set; } = offsetCenterY;
+        public float Rotation { get; set; } = 0;
+        public float OffsetX { get; set; } = offsetCenterX;
+        public float OffsetY { get; set; } = offsetCenterY;
+        public float Size { get; set; } = size;
         public void EffectUpdate(GameTime gameTime)
         {
-            double dt = gameTime.ElapsedGameTime.TotalSeconds;
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (EffectType == EffectType.rotation) Rotation += SpeedEffect * dt;
             //else if (EffectType == EffectType.shaking) 
         }
     }
 
-    internal class BaseEquipment(double offsetCenterX, double offsetCenterY, double sizeX, double sizeY, string name, double X, double Y, string textureBodyPath, Dictionary<string, TextureGun> Guns, Dictionary<string, TextureEffect> constantEffects, double maxSpeed, int max_height_to_be_overcome) : Element(name, X, Y, textureBodyPath)
+    public class BaseEquipment(float offsetCenterX, float offsetCenterY, float sizeX, float sizeY, string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, Dictionary<string, Effect> constantEffects, float maxSpeed, float maxHealth) : Element(name, textureBodyPath)
     {
-        public Dictionary<string, TextureGun> Guns { get; set; } = Guns;
-        public Dictionary<string, TextureEffect> Effects { get; set; } = constantEffects;
-        public double MaxSpeed { get; set; } = maxSpeed;
+        public float Health { get; set; } = maxHealth;
+        public float WorldX { get; set; } = X;
+        public float WorldY { get; set; } = Y;
+        public Dictionary<string, Gun> Guns { get; set; } = Guns;
+        public Dictionary<string, Effect> Effects { get; set; } = constantEffects;
+        public float MaxSpeed { get; set; } = maxSpeed;
+        public float Rotation { get; set; } = 0;
+        public float FixedSizeX { get; set; } = sizeX;
+        public float FixedSizeY { get; set; } = sizeY;
+        public float OffsetX { get; set; } = offsetCenterX;
+        public float OffsetY { get; set; } = offsetCenterY;
+    }
+
+    public class GroundEquipment(float offsetCenterX, float offsetCenterY, float sizeX, float sizeY,
+        string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, int max_height_to_be_overcome,
+        Dictionary<string, Effect> constantEffects, float maxSpeed, string supportTextureName, float maxHealth
+        ) : BaseEquipment(offsetCenterX, offsetCenterY, sizeX, sizeY, name, X, Y, textureBodyPath, Guns, constantEffects, maxSpeed, maxHealth)
+    {
         public int MaxHeightToBeOvercome { get; set; } = max_height_to_be_overcome;
-        public double Rotation { get; set; } = 0;
-        public double FixedSizeX { get; set; } = sizeX;
-        public double FixedSizeY { get; set; } = sizeY;
-        public double OffsetX { get; set; } = offsetCenterX;
-        public double OffsetY { get; set; } = offsetCenterY;
+        public string SupportTextureName { get; set; } = supportTextureName;
     }
 
-    internal class GroundEquipment(double offsetCenterX, double offsetCenterY, double sizeX, double sizeY, string name, double X, double Y, string textureBodyPath, Dictionary<string, TextureGun> Guns, int max_height_to_be_overcome, Dictionary<string, TextureEffect> constantEffects, double maxSpeed) : BaseEquipment(offsetCenterX, offsetCenterY, sizeX, sizeY, name, X, Y, textureBodyPath, Guns, constantEffects, maxSpeed, max_height_to_be_overcome)
+    public class AirEquipment(float offsetCenterX, float offsetCenterY, float sizeX, float sizeY,
+        string name, float X, float Y, string textureBodyName, Dictionary<string, Gun> Guns,
+        Dictionary<string, Effect> constantEffects, float maxSpeed, string shadowTextureName, float maxHealth
+        ) : BaseEquipment(offsetCenterX, offsetCenterY, sizeX, sizeY, name, X, Y, textureBodyName, Guns, constantEffects, maxSpeed, maxHealth)
     {
-
+        public string ShadowTextureName { get; set; } = shadowTextureName;
     }
 
-    internal class AirEquipment(double offsetCenterX, double offsetCenterY, double sizeX, double sizeY, string name, double X, double Y, string textureBodyName, Dictionary<string, TextureGun> Guns, Dictionary<string, TextureEffect> constantEffects, double maxSpeed) : BaseEquipment(offsetCenterX, offsetCenterY, sizeX, sizeY, name, X, Y, textureBodyName, Guns, constantEffects, maxSpeed, 5)
+    public class BaseFactory(string Name, string bodyTextureName, int size, Effect constantEffect, Effect dynamicEffect, Dictionary<string, Element> elementsIn, Dictionary<string, Element> elementsOut, float maxHealth, int capacity) : Element(Name, bodyTextureName)
     {
-
+        public int Capacity { get; set; } = capacity;
+        public float Health { get; set; } = maxHealth;
+        public int Size { get; set; } = size;
+        public Effect ConstantEffect { get; set; } = constantEffect;
+        public Effect DynamicEffect { get; set; } = dynamicEffect;
+        public Dictionary<string, Element> ElementsIn { get; set; } = elementsIn;
+        public Dictionary <string, Element> ElementsOut { get; set; } = elementsOut;
+        public Dictionary<string, Element> Elements { get; set; } = null;
     }
 }
