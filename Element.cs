@@ -91,6 +91,7 @@ namespace Factories_And_Guns
         ) : BaseEquipment(offsetCenterX, offsetCenterY, sizeX, sizeY, name, X, Y, textureBodyName, Guns, constantEffects, maxSpeed, maxHealth)
     {
         public string ShadowTextureName { get; set; } = shadowTextureName;
+        public float Height { get; set; } = 5;
     }
 
     public class BaseFactory(string Name, string bodyTextureName, int size, Effect constantEffect, Effect dynamicEffect, Dictionary<string, Element> elementsIn, Dictionary<string, Element> elementsOut, float maxHealth, int capacity) : Element(Name, bodyTextureName)

@@ -98,6 +98,17 @@ namespace Factories_And_Guns
                 }
             }
 
+            var airUnitList = Field.AirEquipment.Keys;
+            foreach (string name in airUnitList) // Обновление эффектов
+            {
+                var effects = Field.AirEquipment[name].Effects;
+                if (effects != null)
+                {
+                    var unitEffectList = effects.Keys;
+                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(gameTime);
+                }
+            }
+
             BaseFactory[,] buildList = Field.FieldBuild;
             if (buildList != null)
             {
