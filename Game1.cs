@@ -17,8 +17,6 @@ namespace Factories_And_Guns
         private GraphicsDeviceManager _graphics;
         private SpriteBatch SpriteBatch;
 
-        private GroundEquipment _gameEquipment;
-
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -67,63 +65,7 @@ namespace Factories_And_Guns
 
             // НАЗНАЧЕНИЕ: Внутренняя логика.
 
-            var key = Keyboard.GetState();
-
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (key.IsKeyDown(Keys.W)) MatrixCamera.WorldPosY -= CameraSpeed * dt;
-            if (key.IsKeyDown(Keys.S)) MatrixCamera.WorldPosY += CameraSpeed * dt;
-            if (key.IsKeyDown(Keys.A)) MatrixCamera.WorldPosX -= CameraSpeed * dt;
-            if (key.IsKeyDown(Keys.D)) MatrixCamera.WorldPosX += CameraSpeed * dt;
-
-            if (key.IsKeyDown(Keys.Up) && MatrixCamera.SizeY < 60)
-            {
-                MatrixCamera.SizeY *= 1.1f;
-                MatrixCamera.SizeX *= 1.1f;
-            }
-            if (key.IsKeyDown(Keys.Down) && MatrixCamera.SizeY > 10)
-            {
-                MatrixCamera.SizeY /= 1.1f;
-                MatrixCamera.SizeX /= 1.1f;
-            }
-
-            var unitList = Field.FieldEquipment.Keys;
-            foreach (string name in unitList) // Обновление эффектов
-            {
-                var effects = Field.FieldEquipment[name].Effects;
-                if (effects != null)
-                {
-                    var unitEffectList = effects.Keys;
-                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(gameTime);
-                }
-            }
-
-            var airUnitList = Field.AirEquipment.Keys;
-            foreach (string name in airUnitList) // Обновление эффектов
-            {
-                var effects = Field.AirEquipment[name].Effects;
-                if (effects != null)
-                {
-                    var unitEffectList = effects.Keys;
-                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(gameTime);
-                }
-            }
-
-            BaseFactory[,] buildList = Field.FieldBuild;
-            if (buildList != null)
-            {
-                for (int i = 0; i < Field.SizeY; i++)
-                {
-                    for (int j = 0; j < Field.SizeX; j++)
-                    {
-                        buildList[i, j]?.ConstantEffect?.EffectUpdate(gameTime);
-                    }
-                }
-            }
-
-            Field.FieldEquipment["beta1"].Rotation += CameraSpeed / 5 * dt;
-
-            Field.AirEquipment["dragonfly1"].Rotation += CameraSpeed / 5 * dt;
+            Field.InputHalder(gameTime);
 
             base.Update(gameTime);
         }

@@ -61,7 +61,7 @@ namespace Factories_And_Guns
         }
     }
 
-    public class BaseEquipment(float offsetCenterX, float offsetCenterY, float sizeX, float sizeY, string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, Dictionary<string, Effect> constantEffects, float maxSpeed, float maxHealth) : Element(name, textureBodyPath)
+    public class BaseEquipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, Dictionary<string, Effect> constantEffects, float maxSpeed, float maxHealth) : Element(name, textureBodyPath)
     {
         public float Health { get; set; } = maxHealth;
         public float WorldX { get; set; } = X;
@@ -70,28 +70,27 @@ namespace Factories_And_Guns
         public Dictionary<string, Effect> Effects { get; set; } = constantEffects;
         public float MaxSpeed { get; set; } = maxSpeed;
         public float Rotation { get; set; } = 0;
-        public float FixedSizeX { get; set; } = sizeX;
-        public float FixedSizeY { get; set; } = sizeY;
+        public float Size { get; set; } = size;
         public float OffsetX { get; set; } = offsetCenterX;
         public float OffsetY { get; set; } = offsetCenterY;
     }
 
-    public class GroundEquipment(float offsetCenterX, float offsetCenterY, float sizeX, float sizeY,
+    public class GroundEquipment(float offsetCenterX, float offsetCenterY, float size,
         string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, int max_height_to_be_overcome,
         Dictionary<string, Effect> constantEffects, float maxSpeed, string supportTextureName, float maxHealth
-        ) : BaseEquipment(offsetCenterX, offsetCenterY, sizeX, sizeY, name, X, Y, textureBodyPath, Guns, constantEffects, maxSpeed, maxHealth)
+        ) : BaseEquipment(offsetCenterX, offsetCenterY, size, name, X, Y, textureBodyPath, Guns, constantEffects, maxSpeed, maxHealth)
     {
         public int MaxHeightToBeOvercome { get; set; } = max_height_to_be_overcome;
         public string SupportTextureName { get; set; } = supportTextureName;
     }
 
-    public class AirEquipment(float offsetCenterX, float offsetCenterY, float sizeX, float sizeY,
+    public class AirEquipment(float offsetCenterX, float offsetCenterY, float size,
         string name, float X, float Y, string textureBodyName, Dictionary<string, Gun> Guns,
         Dictionary<string, Effect> constantEffects, float maxSpeed, string shadowTextureName, float maxHealth
-        ) : BaseEquipment(offsetCenterX, offsetCenterY, sizeX, sizeY, name, X, Y, textureBodyName, Guns, constantEffects, maxSpeed, maxHealth)
+        ) : BaseEquipment(offsetCenterX, offsetCenterY, size, name, X, Y, textureBodyName, Guns, constantEffects, maxSpeed, maxHealth)
     {
         public string ShadowTextureName { get; set; } = shadowTextureName;
-        public float Height { get; set; } = 5;
+        public float Height { get; set; } = 3;
     }
 
     public class BaseFactory(string Name, string bodyTextureName, int size, Effect constantEffect, Effect dynamicEffect, Dictionary<string, Element> elementsIn, Dictionary<string, Element> elementsOut, float maxHealth, int capacity) : Element(Name, bodyTextureName)
