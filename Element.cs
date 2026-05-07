@@ -1,5 +1,5 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace Factories_And_Guns
@@ -61,7 +61,7 @@ namespace Factories_And_Guns
         }
     }
 
-    public class BaseEquipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, Dictionary<string, Effect> constantEffects, float maxSpeed, float maxHealth) : Element(name, textureBodyPath)
+    public class BaseEquipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, Dictionary<string, Effect> constantEffects, float maxSpeed, float maxSpeedRotation, float maxHealth) : Element(name, textureBodyPath)
     {
         public float Health { get; set; } = maxHealth;
         public float WorldX { get; set; } = X;
@@ -70,15 +70,37 @@ namespace Factories_And_Guns
         public Dictionary<string, Effect> Effects { get; set; } = constantEffects;
         public float MaxSpeed { get; set; } = maxSpeed;
         public float Rotation { get; set; } = 0;
+        public float MaxSpeedRotation { get; set; } = maxSpeedRotation;
         public float Size { get; set; } = size;
         public float OffsetX { get; set; } = offsetCenterX;
         public float OffsetY { get; set; } = offsetCenterY;
+        public void SmoothRotation(Vector2 vector2, GameTime gameTime)
+        {
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            float rotation = Rotation;
+            float rotationSpeed = MaxSpeedRotation;
+            // Зависит от того, куда смотрит "нос" вашего спрайта по умолчанию.
+            // Если вверх: MathF.Atan2(move.X, -move.Y)
+            // Если вправо: MathF.Atan2(move.Y, move.X)
+            float atan = MathF.Atan2(vector2.X, -vector2.Y);
+
+            // Кратчайшее отклонение
+            float angleDiff = MathHelper.WrapAngle(atan - Rotation);
+
+            // Ограничиваем шаг за кадр
+            float maxStep = rotationSpeed * dt;
+            float step = MathHelper.Clamp(angleDiff, -maxStep, maxStep);
+
+            //Обновляем угол и снова «заворачиваем», чтобы он оставался в [-p,p] ( p - число пи )
+            Rotation = MathHelper.WrapAngle(Rotation + step);
+        }
     }
 
     public class GroundEquipment(float offsetCenterX, float offsetCenterY, float size,
         string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, int max_height_to_be_overcome,
-        Dictionary<string, Effect> constantEffects, float maxSpeed, string supportTextureName, float maxHealth
-        ) : BaseEquipment(offsetCenterX, offsetCenterY, size, name, X, Y, textureBodyPath, Guns, constantEffects, maxSpeed, maxHealth)
+        Dictionary<string, Effect> constantEffects, float maxSpeed, float maxSpeedRotation, string supportTextureName, float maxHealth
+        ) : BaseEquipment(offsetCenterX, offsetCenterY, size, name, X, Y, textureBodyPath, Guns, constantEffects, maxSpeed, maxSpeedRotation, maxHealth)
     {
         public int MaxHeightToBeOvercome { get; set; } = max_height_to_be_overcome;
         public string SupportTextureName { get; set; } = supportTextureName;
@@ -86,8 +108,8 @@ namespace Factories_And_Guns
 
     public class AirEquipment(float offsetCenterX, float offsetCenterY, float size,
         string name, float X, float Y, string textureBodyName, Dictionary<string, Gun> Guns,
-        Dictionary<string, Effect> constantEffects, float maxSpeed, string shadowTextureName, float maxHealth
-        ) : BaseEquipment(offsetCenterX, offsetCenterY, size, name, X, Y, textureBodyName, Guns, constantEffects, maxSpeed, maxHealth)
+        Dictionary<string, Effect> constantEffects, float maxSpeed, float maxSpeedRotation, string shadowTextureName, float maxHealth
+        ) : BaseEquipment(offsetCenterX, offsetCenterY, size, name, X, Y, textureBodyName, Guns, constantEffects, maxSpeed, maxSpeedRotation, maxHealth)
     {
         public string ShadowTextureName { get; set; } = shadowTextureName;
         public float Height { get; set; } = 3;

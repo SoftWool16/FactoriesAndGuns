@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace Factories_And_Guns
@@ -67,11 +68,11 @@ namespace Factories_And_Guns
             Dictionary<string, Gun> tower = [];
             Bullet bullet = new("bullet1", 0.1f);
             tower["tower1"] = new Gun("tower", 0, -1.6f, 100, bullet, 0.1f, 3, 4, 1);
-            FieldEquipment["beta1"] = new GroundEquipment(1, 1, 1.5f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, 1, null, 10, null, 1000);
+            FieldEquipment["beta1"] = new GroundEquipment(1, 1, 1.5f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, 1, null, 10, 3, null, 1000);
 
             Dictionary<string, Effect> effects = []; // Создание списка с эффектами
             effects["effect1"] = new Effect("propeller", 0, 0, 15, EffectType.rotation, 3);
-            AirEquipment["dragonfly1"] = new AirEquipment(1, 0.6f, 3, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 5, null, 300);
+            AirEquipment["dragonfly1"] = new AirEquipment(1, 0.6f, 3, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 15, 5, null, 300);
 
             CurrentAirEquipment = AirEquipment["dragonfly1"];
         }
@@ -81,30 +82,52 @@ namespace Factories_And_Guns
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            //float WorldY1 = CurrentAirEquipment.WorldY;
-            //float WorldX1 = CurrentAirEquipment.WorldX;
-
-            //float MaxSpeed1 = CurrentAirEquipment.MaxSpeed;
-
-            //float WorldX2 = CurrentAirEquipment.WorldX - 7;
-
             if (CurrentAirEquipment != null)
             {
-                if (key.IsKeyDown(Keys.W)) CurrentAirEquipment.WorldY -= CurrentAirEquipment.MaxSpeed * dt;
-                if (key.IsKeyDown(Keys.S)) CurrentAirEquipment.WorldY += CurrentAirEquipment.MaxSpeed * dt;
-                if (key.IsKeyDown(Keys.A)) CurrentAirEquipment.WorldX -= CurrentAirEquipment.MaxSpeed * dt;
-                if (key.IsKeyDown(Keys.D)) CurrentAirEquipment.WorldX += CurrentAirEquipment.MaxSpeed * dt;
+                // Направляющий вектор ( (0,0) если нет ввода )
+                Vector2 move = Vector2.Zero;
+                if (key.IsKeyDown(Keys.W)) move.Y -= 1;
+                if (key.IsKeyDown(Keys.S)) move.Y += 1;
+                if (key.IsKeyDown(Keys.A)) move.X -= 1;
+                if (key.IsKeyDown(Keys.D)) move.X += 1;
+
+                if (move != Vector2.Zero)
+                {
+                    // Нормализуем, чтобы скорость была одинаковой по диагонали
+                    move = Vector2.Normalize(move);
+
+                    // Движение
+                    CurrentAirEquipment.WorldX += move.X * CurrentAirEquipment.MaxSpeed * dt;
+                    CurrentAirEquipment.WorldY += move.Y * CurrentAirEquipment.MaxSpeed * dt;
+
+                    // Угол
+                    CurrentAirEquipment.SmoothRotation(move, gameTime);
+                }
 
                 MatrixCamera.WorldPosX = CurrentAirEquipment.WorldX;
                 MatrixCamera.WorldPosY = CurrentAirEquipment.WorldY;
             }
 
-            if (CurrentEquipment != null)
+            else if (CurrentEquipment != null)
             {
-                if (key.IsKeyDown(Keys.W)) CurrentEquipment.WorldY -= CurrentEquipment.MaxSpeed * dt;
-                if (key.IsKeyDown(Keys.S)) CurrentEquipment.WorldY += CurrentEquipment.MaxSpeed * dt;
-                if (key.IsKeyDown(Keys.A)) CurrentEquipment.WorldX -= CurrentEquipment.MaxSpeed * dt;
-                if (key.IsKeyDown(Keys.D)) CurrentEquipment.WorldX += CurrentEquipment.MaxSpeed * dt;
+                // Направляющий вектор (0,0) если нет ввода
+                Vector2 move = Vector2.Zero;
+                if (key.IsKeyDown(Keys.W)) move.Y -= 1;
+                if (key.IsKeyDown(Keys.S)) move.Y += 1;
+                if (key.IsKeyDown(Keys.A)) move.X -= 1;
+                if (key.IsKeyDown(Keys.D)) move.X += 1;
+
+                if (move != Vector2.Zero)
+                {
+                    // Нормализуем, чтобы скорость была одинаковой по диагонали
+                    move = Vector2.Normalize(move);
+                    // Сдвигаем технику
+                    CurrentEquipment.WorldX += move.X * CurrentEquipment.MaxSpeed * dt;
+                    CurrentEquipment.WorldY += move.Y * CurrentEquipment.MaxSpeed * dt;
+
+                    // Вычисляем угол корпуса в сторону движения
+                    CurrentEquipment.SmoothRotation(move, gameTime);
+                }
 
                 MatrixCamera.WorldPosX = CurrentEquipment.WorldX;
                 MatrixCamera.WorldPosY = CurrentEquipment.WorldY;

@@ -233,7 +233,7 @@ namespace Factories_And_Guns
                         destinationRectangle,
                         null,
                         Color.White,
-                        (float)unit.Rotation,
+                        unit.Rotation,
                         new Vector2(
                             (float)(body.Width / 2 * unit.OffsetX),
                             (float)(body.Height / 2 * unit.OffsetY)
@@ -259,7 +259,7 @@ namespace Factories_And_Guns
                                 destinationRectangleGuns,
                                 null,
                                 Color.White,
-                                (float)gun.Rotation,
+                                gun.Rotation,
                                 new Vector2(
                                     gunT.Width / 2,
                                     gunT.Height / 2
@@ -287,7 +287,7 @@ namespace Factories_And_Guns
                                 destinationRectangleEffects,
                                 null,
                                 Color.White,
-                                (float)effect.Rotation,
+                                effect.Rotation,
                                 new Vector2(
                                     effectT.Width / 2,
                                     effectT.Height / 2
@@ -324,7 +324,7 @@ namespace Factories_And_Guns
                         destinationRectangle,
                         null,
                         Color.White,
-                        (float)unit.Rotation,
+                        unit.Rotation,
                         new Vector2(
                             (float)(shadow.Width / 2 * unit.OffsetX),
                             (float)(shadow.Height / 2 * unit.OffsetY)
@@ -358,7 +358,7 @@ namespace Factories_And_Guns
                         destinationRectangle,
                         null,
                         Color.White,
-                        (float)unit.Rotation,
+                        unit.Rotation,
                         new Vector2(
                             (float)(body.Width / 2 * unit.OffsetX),
                             (float)(body.Height / 2 * unit.OffsetY)
@@ -384,7 +384,7 @@ namespace Factories_And_Guns
                                 destinationRectangleGuns,
                                 null,
                                 Color.White,
-                                (float)gun.Rotation,
+                                gun.Rotation,
                                 new Vector2(
                                     gunT.Width / 2,
                                     gunT.Height / 2
@@ -412,7 +412,7 @@ namespace Factories_And_Guns
                                 destinationRectangleEffects,
                                 null,
                                 Color.White,
-                                (float)effect.Rotation,
+                                effect.Rotation,
                                 new Vector2(
                                     effectT.Width / 2,
                                     effectT.Height / 2
