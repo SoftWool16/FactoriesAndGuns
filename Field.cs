@@ -96,13 +96,50 @@ namespace Factories_And_Guns
                     // Нормализуем, чтобы скорость была одинаковой по диагонали
                     move = Vector2.Normalize(move);
 
+                    float vectorX = CurrentAirEquipment.VectorSpeedX;
+                    float vectorY = CurrentAirEquipment.VectorSpeedY;
+
                     // Движение
-                    CurrentAirEquipment.WorldX += move.X * CurrentAirEquipment.MaxSpeed * dt;
-                    CurrentAirEquipment.WorldY += move.Y * CurrentAirEquipment.MaxSpeed * dt;
+                    if (vectorX < CurrentAirEquipment.MaxSpeed && move.X != 0)
+                        vectorX += move.X;
+                    else if (move.X == 0 && vectorX > CurrentAirEquipment.MaxSpeed)
+                        vectorX -= 1;
+
+                    if (vectorY < CurrentAirEquipment.MaxSpeed && move.Y != 0)
+                        vectorY += move.Y;
+                    else if (move.Y == 0 && vectorY > CurrentAirEquipment.MaxSpeed)
+                        vectorY -= 1;
+
+                    CurrentAirEquipment.VectorSpeedX = vectorX;
+                    CurrentAirEquipment.VectorSpeedY = vectorY;
 
                     // Угол
                     CurrentAirEquipment.SmoothRotation(move, gameTime);
                 }
+                else
+                {
+                    float vectorX = CurrentAirEquipment.VectorSpeedX;
+                    float vectorY = CurrentAirEquipment.VectorSpeedY;
+
+                    if (vectorX > 0) vectorX -= 1;
+                    else if(vectorX < 0) vectorX += 1;
+                    else vectorX = 0;
+
+                    if (vectorY > 0) vectorY -= 1;
+                    else if(vectorY < 0) vectorY += 1;
+                    else vectorY = 0;
+
+                    CurrentAirEquipment.VectorSpeedX = vectorX;
+                    CurrentAirEquipment.VectorSpeedY = vectorY;
+                }
+
+                //if (MatrixCamera.WorldPosX + 7 < CurrentAirEquipment.WorldX ||
+                //MatrixCamera.WorldPosX - 7 > CurrentAirEquipment.WorldX)
+                //MatrixCamera.WorldPosX += move.X * CurrentAirEquipment.MaxSpeed * dt;
+
+                //if (MatrixCamera.WorldPosY + 7 < CurrentAirEquipment.WorldY ||
+                //MatrixCamera.WorldPosY - 7 > CurrentAirEquipment.WorldY)
+                //MatrixCamera.WorldPosY += move.Y * CurrentAirEquipment.MaxSpeed * dt;
 
                 MatrixCamera.WorldPosX = CurrentAirEquipment.WorldX;
                 MatrixCamera.WorldPosY = CurrentAirEquipment.WorldY;
@@ -145,10 +182,10 @@ namespace Factories_And_Guns
             }
 
             var unitList = FieldEquipment.Keys;
-            foreach (string name in unitList) // Обновление эффектов
+            foreach (string name in unitList)
             {
                 var effects = FieldEquipment[name].Effects;
-                if (effects != null)
+                if (effects != null) // Обновление эффектов
                 {
                     var unitEffectList = effects.Keys;
                     foreach (var effect in unitEffectList) effects[effect].EffectUpdate(gameTime);
@@ -156,14 +193,17 @@ namespace Factories_And_Guns
             }
 
             var airUnitList = AirEquipment.Keys;
-            foreach (string name in airUnitList) // Обновление эффектов
+            foreach (string name in airUnitList)
             {
                 var effects = AirEquipment[name].Effects;
-                if (effects != null)
+                if (effects != null) // Обновление эффектов
                 {
                     var unitEffectList = effects.Keys;
                     foreach (var effect in unitEffectList) effects[effect].EffectUpdate(gameTime);
                 }
+
+                AirEquipment[name].WorldX += AirEquipment[name].VectorSpeedX * dt;
+                AirEquipment[name].WorldY += AirEquipment[name].VectorSpeedY * dt;
             }
 
             BaseFactory[,] buildList = FieldBuild;

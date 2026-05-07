@@ -71,6 +71,8 @@ namespace Factories_And_Guns
         public float MaxSpeed { get; set; } = maxSpeed;
         public float Rotation { get; set; } = 0;
         public float MaxSpeedRotation { get; set; } = maxSpeedRotation;
+        public float VectorSpeedX { get; set; } = 0;
+        public float VectorSpeedY { get; set; } = 0;
         public float Size { get; set; } = size;
         public float OffsetX { get; set; } = offsetCenterX;
         public float OffsetY { get; set; } = offsetCenterY;
