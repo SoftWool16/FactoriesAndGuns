@@ -8,15 +8,15 @@ namespace Factories_And_Guns
 {
     internal class Field
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "New Field";
 
-        public Element[,] FieldBackground;                              // Слой 1 - фоновый.
-        public BaseFactory[,] FieldBuild;                               // Слой 2 - постройки.
+        public Element[,] FieldBackground = null;                              // Слой 1 - фоновый.
+        public BaseFactory[,] FieldBuild = null;                               // Слой 2 - постройки.
         public Dictionary<string, GroundEquipment> FieldEquipment = []; // Слой 3 - прочая техника.
         public Bullet[] BulletList = [];                                // Слой 4 - пули, бомбы и т.п.
         public Dictionary<string, AirEquipment> AirEquipment = [];      // Слой 5 - воздушная техника.
-        public int SizeX { get; set; }
-        public int SizeY { get; set; }
+        public int SizeX { get; set; } = 0;
+        public int SizeY { get; set; } = 0;
         public GroundEquipment CurrentEquipment { get; set; } = null;
         public AirEquipment CurrentAirEquipment { get; set; } = null;
 
@@ -67,12 +67,12 @@ namespace Factories_And_Guns
 
             Dictionary<string, Gun> tower = [];
             Bullet bullet = new("bullet1", 0.1f);
-            tower["tower1"] = new Gun("tower", 0, -1.6f, 100, bullet, 0.1f, 3, 4, 1);
-            FieldEquipment["beta1"] = new GroundEquipment(1, 1, 1.5f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, 1, null, 10, 3, null, 1000);
+            tower["tower1"] = new Gun("tower", 0, -1.3f, 100, bullet, 0.1f, 3, 4, 1);
+            FieldEquipment["beta1"] = new GroundEquipment(1, 1, 1.5f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, 1, null, 10, 20, 50, 6, null, 1000, EquipmentMoveType.tracked);
 
             Dictionary<string, Effect> effects = []; // Создание списка с эффектами
             effects["effect1"] = new Effect("propeller", 0, 0, 15, EffectType.rotation, 3);
-            AirEquipment["dragonfly1"] = new AirEquipment(1, 0.6f, 3, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 15, 5, null, 300);
+            AirEquipment["dragonfly1"] = new AirEquipment(1, 0.6f, 3, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 15, 40, 5, null, 300);
 
             CurrentAirEquipment = AirEquipment["dragonfly1"];
         }
@@ -82,92 +82,19 @@ namespace Factories_And_Guns
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (CurrentAirEquipment != null)
+            CurrentEquipment?.InputHalderEquipment(key, dt);
+            CurrentAirEquipment?.InputHalderEquipment(key, dt);
+
+            if (key.IsKeyDown(Keys.D1))
             {
-                // Направляющий вектор ( (0,0) если нет ввода )
-                Vector2 move = Vector2.Zero;
-                if (key.IsKeyDown(Keys.W)) move.Y -= 1;
-                if (key.IsKeyDown(Keys.S)) move.Y += 1;
-                if (key.IsKeyDown(Keys.A)) move.X -= 1;
-                if (key.IsKeyDown(Keys.D)) move.X += 1;
-
-                if (move != Vector2.Zero)
-                {
-                    // Нормализуем, чтобы скорость была одинаковой по диагонали
-                    move = Vector2.Normalize(move);
-
-                    float vectorX = CurrentAirEquipment.VectorSpeedX;
-                    float vectorY = CurrentAirEquipment.VectorSpeedY;
-
-                    // Движение
-                    if (vectorX < CurrentAirEquipment.MaxSpeed && move.X != 0)
-                        vectorX += move.X;
-                    else if (move.X == 0 && vectorX > CurrentAirEquipment.MaxSpeed)
-                        vectorX -= 1;
-
-                    if (vectorY < CurrentAirEquipment.MaxSpeed && move.Y != 0)
-                        vectorY += move.Y;
-                    else if (move.Y == 0 && vectorY > CurrentAirEquipment.MaxSpeed)
-                        vectorY -= 1;
-
-                    CurrentAirEquipment.VectorSpeedX = vectorX;
-                    CurrentAirEquipment.VectorSpeedY = vectorY;
-
-                    // Угол
-                    CurrentAirEquipment.SmoothRotation(move, gameTime);
-                }
-                else
-                {
-                    float vectorX = CurrentAirEquipment.VectorSpeedX;
-                    float vectorY = CurrentAirEquipment.VectorSpeedY;
-
-                    if (vectorX > 0) vectorX -= 1;
-                    else if(vectorX < 0) vectorX += 1;
-                    else vectorX = 0;
-
-                    if (vectorY > 0) vectorY -= 1;
-                    else if(vectorY < 0) vectorY += 1;
-                    else vectorY = 0;
-
-                    CurrentAirEquipment.VectorSpeedX = vectorX;
-                    CurrentAirEquipment.VectorSpeedY = vectorY;
-                }
-
-                //if (MatrixCamera.WorldPosX + 7 < CurrentAirEquipment.WorldX ||
-                //MatrixCamera.WorldPosX - 7 > CurrentAirEquipment.WorldX)
-                //MatrixCamera.WorldPosX += move.X * CurrentAirEquipment.MaxSpeed * dt;
-
-                //if (MatrixCamera.WorldPosY + 7 < CurrentAirEquipment.WorldY ||
-                //MatrixCamera.WorldPosY - 7 > CurrentAirEquipment.WorldY)
-                //MatrixCamera.WorldPosY += move.Y * CurrentAirEquipment.MaxSpeed * dt;
-
-                MatrixCamera.WorldPosX = CurrentAirEquipment.WorldX;
-                MatrixCamera.WorldPosY = CurrentAirEquipment.WorldY;
+                CurrentAirEquipment ??= AirEquipment["dragonfly1"];
+                if (CurrentEquipment != null) CurrentEquipment = null;
             }
 
-            else if (CurrentEquipment != null)
+            if (key.IsKeyDown(Keys.D2))
             {
-                // Направляющий вектор (0,0) если нет ввода
-                Vector2 move = Vector2.Zero;
-                if (key.IsKeyDown(Keys.W)) move.Y -= 1;
-                if (key.IsKeyDown(Keys.S)) move.Y += 1;
-                if (key.IsKeyDown(Keys.A)) move.X -= 1;
-                if (key.IsKeyDown(Keys.D)) move.X += 1;
-
-                if (move != Vector2.Zero)
-                {
-                    // Нормализуем, чтобы скорость была одинаковой по диагонали
-                    move = Vector2.Normalize(move);
-                    // Сдвигаем технику
-                    CurrentEquipment.WorldX += move.X * CurrentEquipment.MaxSpeed * dt;
-                    CurrentEquipment.WorldY += move.Y * CurrentEquipment.MaxSpeed * dt;
-
-                    // Вычисляем угол корпуса в сторону движения
-                    CurrentEquipment.SmoothRotation(move, gameTime);
-                }
-
-                MatrixCamera.WorldPosX = CurrentEquipment.WorldX;
-                MatrixCamera.WorldPosY = CurrentEquipment.WorldY;
+                CurrentEquipment ??= FieldEquipment["beta1"];
+                if (CurrentAirEquipment != null) CurrentAirEquipment = null;
             }
 
             if (key.IsKeyDown(Keys.Up) && MatrixCamera.SizeY < 60)
@@ -184,26 +111,39 @@ namespace Factories_And_Guns
             var unitList = FieldEquipment.Keys;
             foreach (string name in unitList)
             {
-                var effects = FieldEquipment[name].Effects;
+                var unit = FieldEquipment[name];
+
+                var effects = unit.Effects;
                 if (effects != null) // Обновление эффектов
                 {
                     var unitEffectList = effects.Keys;
-                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(gameTime);
+                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(dt);
+                }
+
+                if (unit.Velocity != Vector2.Zero) // Обновление движения
+                {
+                    FieldEquipment[name].WorldX += unit.Velocity.X * dt;
+                    FieldEquipment[name].WorldY += unit.Velocity.Y * dt;
                 }
             }
 
             var airUnitList = AirEquipment.Keys;
             foreach (string name in airUnitList)
             {
-                var effects = AirEquipment[name].Effects;
+                var airUnit = AirEquipment[name];
+
+                var effects = airUnit.Effects;
                 if (effects != null) // Обновление эффектов
                 {
                     var unitEffectList = effects.Keys;
-                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(gameTime);
+                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(dt);
                 }
 
-                AirEquipment[name].WorldX += AirEquipment[name].VectorSpeedX * dt;
-                AirEquipment[name].WorldY += AirEquipment[name].VectorSpeedY * dt;
+                if (AirEquipment[name].Velocity != Vector2.Zero) // Обновление движения
+                {
+                    AirEquipment[name].WorldX += airUnit.Velocity.X * dt;
+                    AirEquipment[name].WorldY += airUnit.Velocity.Y * dt;
+                }
             }
 
             BaseFactory[,] buildList = FieldBuild;
@@ -213,7 +153,7 @@ namespace Factories_And_Guns
                 {
                     for (int j = 0; j < SizeX; j++)
                     {
-                        buildList[i, j]?.ConstantEffect?.EffectUpdate(gameTime);
+                        buildList[i, j]?.ConstantEffect?.EffectUpdate(dt);
                     }
                 }
             }
