@@ -10,15 +10,21 @@ namespace Factories_And_Guns
     {
         public string Name { get; set; } = "New Field";
 
-        public Element[,] FieldBackground = null;                              // Слой 1 - фоновый.
-        public BaseFactory[,] FieldBuild = null;                               // Слой 2 - постройки.
-        public Dictionary<string, GroundEquipment> FieldEquipment = []; // Слой 3 - прочая техника.
-        public Bullet[] BulletList = [];                                // Слой 4 - пули, бомбы и т.п.
-        public Dictionary<string, AirEquipment> AirEquipment = [];      // Слой 5 - воздушная техника.
+        public Element[,] FieldBackground = null;                              // Фон
+        public BaseFactory[,] FieldBuild = null;                               // Постройки
+        public Dictionary<string, Dictionary<string, Equipment>> FieldEquipment = []; // Техника
+        public Bullet[] BulletList = [];                                // Снаряды
         public int SizeX { get; set; } = 0;
         public int SizeY { get; set; } = 0;
-        public GroundEquipment CurrentEquipment { get; set; } = null;
-        public AirEquipment CurrentAirEquipment { get; set; } = null;
+        public Equipment CurrentEquipment { get; set; } = null;
+
+        //public enum TypeEffectsOnField
+        //{
+        //    hit,
+        //    explosion,
+        //    vortex,
+        //    slipping
+        //}
 
         //public Field (string name, Element[,] fields, int sizeX, int sizeY)
         //{
@@ -57,7 +63,10 @@ namespace Factories_And_Guns
                 }
             }
 
-            Effect effects1 = new("drill", 0, 0, 2, EffectType.rotation, 2);
+            FieldEquipment["ground"] = [];
+            FieldEquipment["air"] = [];
+
+            MovingParts effects1 = new("drill", 0, 0, 2, MovingPartsType.rotation, 2);
             Dictionary<string, Element> elementsOut = [];
             elementsOut["metal"] = new("metal1", "metal");
             FieldBuild[8, 8] = new("Elementary_drill", "Build/Elementary_drill", 2, effects1, null, null, elementsOut, 100, 10);
@@ -67,82 +76,64 @@ namespace Factories_And_Guns
 
             Dictionary<string, Gun> tower = [];
             Bullet bullet = new("bullet1", 0.1f);
-            tower["tower1"] = new Gun("tower", 0, -1.3f, 100, bullet, 0.1f, 3, 4, 1);
-            FieldEquipment["beta1"] = new GroundEquipment(1, 1, 1.5f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, 1, null, 10, 20, 50, 6, null, 1000, EquipmentMoveType.tracked);
+            tower["tower1"] = new Gun("tower", 0, -1.3f, 100, bullet, 0.1f, 3, 4, 1.2f);
+            FieldEquipment["ground"]["beta1"] = new Equipment(1, 1, 1.8f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, null, 20, 20, 50, 6, 1000, EquipmentMoveType.tracked, 0, 1);
 
-            Dictionary<string, Effect> effects = []; // Создание списка с эффектами
-            effects["effect1"] = new Effect("propeller", 0, 0, 15, EffectType.rotation, 3);
-            AirEquipment["dragonfly1"] = new AirEquipment(1, 0.6f, 3, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 15, 40, 5, null, 300);
+            Dictionary<string, MovingParts> effects = []; // Создание списка с подвижными частями
+            effects["effect1"] = new MovingParts("propeller", 0, 0, 15, MovingPartsType.rotation, 4.6f);
+            FieldEquipment["air"]["dragonfly1"] = new Equipment(1, 0.6f, 4.6f, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 25, 40, 5, 300, EquipmentMoveType.hovering);
 
-            CurrentAirEquipment = AirEquipment["dragonfly1"];
+            CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
         }
-        public void InputHalder(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             var key = Keyboard.GetState();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             CurrentEquipment?.InputHalderEquipment(key, dt);
-            CurrentAirEquipment?.InputHalderEquipment(key, dt);
 
             if (key.IsKeyDown(Keys.D1))
             {
-                CurrentAirEquipment ??= AirEquipment["dragonfly1"];
-                if (CurrentEquipment != null) CurrentEquipment = null;
+                if (CurrentEquipment != FieldEquipment["air"]["dragonfly1"]) CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
             }
 
             if (key.IsKeyDown(Keys.D2))
             {
-                CurrentEquipment ??= FieldEquipment["beta1"];
-                if (CurrentAirEquipment != null) CurrentAirEquipment = null;
+                if (CurrentEquipment != FieldEquipment["ground"]["beta1"]) CurrentEquipment = FieldEquipment["ground"]["beta1"];
             }
 
-            if (key.IsKeyDown(Keys.Up) && MatrixCamera.SizeY < 60)
+            if (key.IsKeyDown(Keys.Up) && MatrixCamera.SizeY < 150)
             {
                 MatrixCamera.SizeY *= 1.1f;
                 MatrixCamera.SizeX *= 1.1f;
             }
-            if (key.IsKeyDown(Keys.Down) && MatrixCamera.SizeY > 10)
+            if (key.IsKeyDown(Keys.Down) && MatrixCamera.SizeY > 30)
             {
                 MatrixCamera.SizeY /= 1.1f;
                 MatrixCamera.SizeX /= 1.1f;
             }
 
-            var unitList = FieldEquipment.Keys;
-            foreach (string name in unitList)
+            var unitTypeList = FieldEquipment.Keys;
+            foreach (string type in unitTypeList)
             {
-                var unit = FieldEquipment[name];
-
-                var effects = unit.Effects;
-                if (effects != null) // Обновление эффектов
+                var unitList = FieldEquipment[type].Keys;
+                foreach (string name in unitList)
                 {
-                    var unitEffectList = effects.Keys;
-                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(dt);
-                }
+                    var unit = FieldEquipment[type][name];
 
-                if (unit.Velocity != Vector2.Zero) // Обновление движения
-                {
-                    FieldEquipment[name].WorldX += unit.Velocity.X * dt;
-                    FieldEquipment[name].WorldY += unit.Velocity.Y * dt;
-                }
-            }
+                    var effects = unit.MovingParts;
+                    if (effects != null) // Обновление эффектов
+                    {
+                        var unitEffectList = effects.Keys;
+                        foreach (var effect in unitEffectList) effects[effect].MovingPartsUpdate(dt);
+                    }
 
-            var airUnitList = AirEquipment.Keys;
-            foreach (string name in airUnitList)
-            {
-                var airUnit = AirEquipment[name];
-
-                var effects = airUnit.Effects;
-                if (effects != null) // Обновление эффектов
-                {
-                    var unitEffectList = effects.Keys;
-                    foreach (var effect in unitEffectList) effects[effect].EffectUpdate(dt);
-                }
-
-                if (AirEquipment[name].Velocity != Vector2.Zero) // Обновление движения
-                {
-                    AirEquipment[name].WorldX += airUnit.Velocity.X * dt;
-                    AirEquipment[name].WorldY += airUnit.Velocity.Y * dt;
+                    if (unit.Velocity != Vector2.Zero) // Обновление движения
+                    {
+                        FieldEquipment[type][name].WorldX += unit.Velocity.X * dt;
+                        FieldEquipment[type][name].WorldY += unit.Velocity.Y * dt;
+                    }
                 }
             }
 
@@ -153,10 +144,14 @@ namespace Factories_And_Guns
                 {
                     for (int j = 0; j < SizeX; j++)
                     {
-                        buildList[i, j]?.ConstantEffect?.EffectUpdate(dt);
+                        buildList[i, j]?.MovingParts?.MovingPartsUpdate(dt);
                     }
                 }
             }
         }
+        //public void AddEffect(float x,  float y, float time, float size, TypeEffectsOnField type)
+        //{
+        //
+        //}
     }
 }

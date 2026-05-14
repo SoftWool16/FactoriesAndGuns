@@ -65,7 +65,7 @@ namespace Factories_And_Guns
 
             // НАЗНАЧЕНИЕ: Внутренняя логика.
 
-            Field.InputHalder(gameTime);
+            Field.Update(gameTime);
 
             base.Update(gameTime);
         }

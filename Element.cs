@@ -2,16 +2,17 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Factories_And_Guns
 {
     public class Element(string name, string texturePath)
     {
         public string Name { get; set; } = name;
-        public string TexturePath { get; set; } = texturePath;
+        public string TexturesFolderPath { get; set; } = texturePath;
     }
 
-    public enum EffectType
+    public enum MovingPartsType
     {
         rotation,
         shaking,
@@ -52,41 +53,84 @@ namespace Factories_And_Guns
         public float Size { get; set; } = size;
     }
 
-    public class Effect (string textureName, float offsetCenterX, float offsetCenterY, float speedEffect, EffectType effectType, float size)
+    public class MovingParts (string textureName, float offsetCenterX, float offsetCenterY, float speedEffect, MovingPartsType movingPartsType, float size)
     {
         public string TextureName { get; set; } = textureName;
         public float SpeedEffect {  get; set; } = speedEffect;
-        public EffectType EffectType { get; set; } = effectType;
+        public MovingPartsType MovingPartsType { get; set; } = movingPartsType;
         public float Rotation { get; set; } = 0;
         public float OffsetX { get; set; } = offsetCenterX;
         public float OffsetY { get; set; } = offsetCenterY;
         public float Size { get; set; } = size;
-        public void EffectUpdate(float dt)
+        public void MovingPartsUpdate(float dt)
         {
-            if (EffectType == EffectType.rotation) Rotation += SpeedEffect * dt;
+            if (MovingPartsType == MovingPartsType.rotation) Rotation += SpeedEffect * dt;
             //else if (EffectType == EffectType.shaking) 
         }
     }
 
-    public class BaseEquipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, Dictionary<string, Effect> constantEffects, float maxSpeed, float acceleration, float friction, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType) : Element(name, textureBodyPath)
+    public class Equipment : Element
     {
-        public float Health { get; set; } = maxHealth; // Текущее здоровье
-        public float WorldX { get; set; } = X; // Позиция по X относительно мира
-        public float WorldY { get; set; } = Y; // Позиция по Y относительно мира
-        public Dictionary<string, Gun> Guns { get; set; } = Guns; // Список орудий
-        public Dictionary<string, Effect> Effects { get; set; } = constantEffects; // Список постоянных эффектов
-        public float MaxSpeed { get; set; } = maxSpeed; // Максимальная скорость передвижения
+        public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float friction, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType, int maxHeightToBeOvercome, int maxDepthToBeOvercome) : base(name, textureFolderPath)
+        {
+            Health = maxHealth;
+            WorldX = X;
+            WorldY = Y;
+            Guns = guns;
+            MovingParts = movingParts;
+            MaxSpeed = maxSpeed;
+            Acceleration = acceleration;
+            Friction = friction;
+            MaxSpeedRotation = maxSpeedRotation;
+            MoveType = moveType;
+            OffsetX = offsetCenterX;
+            OffsetY = offsetCenterY;
+            Size = size;
+            MaxHeightToBeOvercome = maxHeightToBeOvercome;
+            MaxDepthToBeOvercome = maxDepthToBeOvercome;
+        }
+
+        public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType) : base(name, textureFolderPath)
+        {
+            Health = maxHealth;
+            WorldX = X;
+            WorldY = Y;
+            Guns = guns;
+            MovingParts = movingParts;
+            MaxSpeed = maxSpeed;
+            Acceleration = acceleration;
+            Friction = acceleration;
+            MaxSpeedRotation = maxSpeedRotation;
+            MoveType = moveType;
+            OffsetX = offsetCenterX;
+            OffsetY = offsetCenterY;
+            Size = size;
+            MaxHeightToBeOvercome = -1;
+            MaxDepthToBeOvercome = -1;
+        }
+
+        public float Health { get; set; }  // Текущее здоровье
+        public float WorldX { get; set; }  // Позиция по X относительно мира
+        public float WorldY { get; set; }  // Позиция по Y относительно мира
+        public Dictionary<string, Gun> Guns { get; set; }  // Список орудий
+        public Dictionary<string, MovingParts> MovingParts { get; set; }  // Список постоянных эффектов
+        public float MaxSpeed { get; set; }  // Максимальная скорость передвижения
         public float Rotation { get; set; } = 0; // Текущий поворот корпуса
-        public float MaxSpeedRotation { get; set; } = maxSpeedRotation; // Максимальная скорость поворота корпуса
-        public Vector2 Velocity { get; set; } = Vector2.Zero; // текущая скорость
-        public float Acceleration { get; set; } = acceleration; // ускорение
-        public float Friction { get; set; } = friction;     // замедление, когда нет ввода
-        public float Size { get; set; } = size;  // Размер ( в блоках )
-        public float OffsetX { get; set; } = offsetCenterX; // Смещение центра по X относительно текстуры
-        public float OffsetY { get; set; } = offsetCenterY; // Смещение центра по Y относительно текстуры
-        public EquipmentMoveType MoveType { get; set; } = moveType; // Тип передвижения
-        public float WorldPointX { get; set; } = X; // Точка X для перемещения в неё
-        public float WorldPointY { get; set; } = Y; // Точка Y для перемещения в неё
+        public float MaxSpeedRotation { get; set; }  // Максимальная скорость поворота корпуса
+        public Vector2 Velocity { get; set; } = Vector2.Zero; // Текущая скорость
+        public float Acceleration { get; set; }  // Ускорение
+        public float Friction { get; set; }      // Замедление
+        public float Size { get; set; }   // Размер ( в блоках )
+        public float OffsetX { get; set; }  // Смещение центра по X относительно текстуры
+        public float OffsetY { get; set; }  // Смещение центра по Y относительно текстуры
+        public EquipmentMoveType MoveType { get; set; }  // Тип передвижения
+        public float WorldPointX { get; set; } = -1;  // Точка X для перемещения в неё
+        public float WorldPointY { get; set; } = -1;  // Точка Y для перемещения в неё
+
+        public int MaxHeightToBeOvercome { get; set; } // Максимальная проходимая высота
+        public int MaxDepthToBeOvercome { get; set; } // Максимальная проходимая глубина
+
+        public float Height { get; set; } = 3; // Высота полёта ( для воздушных )
 
         public void SmoothRotation(Vector2 vector2, float dt) // Плавный поворот
         {
@@ -192,31 +236,13 @@ namespace Factories_And_Guns
         }
     }
 
-    public class GroundEquipment(float offsetCenterX, float offsetCenterY, float size,
-        string name, float X, float Y, string textureBodyPath, Dictionary<string, Gun> Guns, int max_height_to_be_overcome,
-        Dictionary<string, Effect> constantEffects, float maxSpeed, float acceleration, float friction, float maxSpeedRotation, string supportTextureName, float maxHealth, EquipmentMoveType moveType
-        ) : BaseEquipment(offsetCenterX, offsetCenterY, size, name, X, Y, textureBodyPath, Guns, constantEffects, maxSpeed, acceleration, friction, maxSpeedRotation, maxHealth, moveType)
-    {
-        public int MaxHeightToBeOvercome { get; set; } = max_height_to_be_overcome;
-        public string SupportTextureName { get; set; } = supportTextureName;
-    }
-
-    public class AirEquipment(float offsetCenterX, float offsetCenterY, float size,
-        string name, float X, float Y, string textureBodyName, Dictionary<string, Gun> Guns,
-        Dictionary<string, Effect> constantEffects, float maxSpeed, float accelerationAndFriction, float maxSpeedRotation, string shadowTextureName, float maxHealth
-        ) : BaseEquipment(offsetCenterX, offsetCenterY, size, name, X, Y, textureBodyName, Guns, constantEffects, maxSpeed, accelerationAndFriction, accelerationAndFriction, maxSpeedRotation, maxHealth, EquipmentMoveType.hovering)
-    {
-        public string ShadowTextureName { get; set; } = shadowTextureName;
-        public float Height { get; set; } = 3;
-    }
-
-    public class BaseFactory(string Name, string bodyTextureName, int size, Effect constantEffect, Effect dynamicEffect, Dictionary<string, Element> elementsIn, Dictionary<string, Element> elementsOut, float maxHealth, int capacity) : Element(Name, bodyTextureName)
+    public class BaseFactory(string Name, string bodyTextureName, int size, MovingParts movingParts, MovingParts dynamicEffect, Dictionary<string, Element> elementsIn, Dictionary<string, Element> elementsOut, float maxHealth, int capacity) : Element(Name, bodyTextureName)
     {
         public int Capacity { get; set; } = capacity;
         public float Health { get; set; } = maxHealth;
         public int Size { get; set; } = size;
-        public Effect ConstantEffect { get; set; } = constantEffect;
-        public Effect DynamicEffect { get; set; } = dynamicEffect;
+        public MovingParts MovingParts { get; set; } = movingParts;
+        public MovingParts DynamicEffect { get; set; } = dynamicEffect;
         public Dictionary<string, Element> ElementsIn { get; set; } = elementsIn;
         public Dictionary <string, Element> ElementsOut { get; set; } = elementsOut;
         public Dictionary<string, Element> Elements { get; set; } = null;
