@@ -105,13 +105,13 @@ namespace Factories_And_Guns
 
             if (key.IsKeyDown(Keys.Up) && MatrixCamera.SizeY < 150)
             {
-                MatrixCamera.SizeY *= 1.1f;
-                MatrixCamera.SizeX *= 1.1f;
+                MatrixCamera.SizeY *= 1.05f;
+                MatrixCamera.SizeX *= 1.05f;
             }
             if (key.IsKeyDown(Keys.Down) && MatrixCamera.SizeY > 30)
             {
-                MatrixCamera.SizeY /= 1.1f;
-                MatrixCamera.SizeX /= 1.1f;
+                MatrixCamera.SizeY /= 1.05f;
+                MatrixCamera.SizeX /= 1.05f;
             }
 
             var unitTypeList = FieldEquipment.Keys;
@@ -120,20 +120,7 @@ namespace Factories_And_Guns
                 var unitList = FieldEquipment[type].Keys;
                 foreach (string name in unitList)
                 {
-                    var unit = FieldEquipment[type][name];
-
-                    var effects = unit.MovingParts;
-                    if (effects != null) // Обновление эффектов
-                    {
-                        var unitEffectList = effects.Keys;
-                        foreach (var effect in unitEffectList) effects[effect].MovingPartsUpdate(dt);
-                    }
-
-                    if (unit.Velocity != Vector2.Zero) // Обновление движения
-                    {
-                        FieldEquipment[type][name].WorldX += unit.Velocity.X * dt;
-                        FieldEquipment[type][name].WorldY += unit.Velocity.Y * dt;
-                    }
+                    FieldEquipment[type][name].Update(dt);
                 }
             }
 

@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -64,7 +65,16 @@ namespace Factories_And_Guns
         public float Size { get; set; } = size;
         public void MovingPartsUpdate(float dt)
         {
-            if (MovingPartsType == MovingPartsType.rotation) Rotation += SpeedEffect * dt;
+            if (MovingPartsType == MovingPartsType.rotation)
+            {
+                float r = Rotation + SpeedEffect * dt;
+                if (r >= 360)
+                {
+                    float r1 = 360 - r;
+                    Rotation = r1;
+                }
+                else Rotation = r;
+            }
             //else if (EffectType == EffectType.shaking) 
         }
     }
@@ -233,6 +243,20 @@ namespace Factories_And_Guns
 
             MatrixCamera.WorldPosX = WorldX;
             MatrixCamera.WorldPosY = WorldY;
+        }
+        public void Update(float dt)
+        {
+            if (MovingParts != null) // Обновление эффектов
+            {
+                var unitEffectList = MovingParts.Keys;
+                foreach (var effect in unitEffectList) MovingParts[effect].MovingPartsUpdate(dt);
+            }
+
+            if (Velocity != Vector2.Zero) // Обновление движения
+            {
+                WorldX += Velocity.X * dt;
+                WorldY += Velocity.Y * dt;
+            }
         }
     }
 

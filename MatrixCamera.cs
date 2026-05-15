@@ -73,8 +73,8 @@ namespace Factories_And_Guns
                             Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
                                 (int)((i + X2 + (factory.Size / 2)) * StaticSize - nX), // Координата X ( (int)((индекс.поX + половина.масштабаX) * размер.объекта - дробное.число) )
                                 (int)((j + Y2 + (factory.Size / 2)) * StaticSize - nY), // Координата Y
-                                (int)(StaticSize * factory.Size * 1.3),  // Ширина в пикселях
-                                (int)(StaticSize * factory.Size * 1.3)   // Высота в пикселях
+                                (int)(StaticSize * factory.Size * 1.15),  // Ширина в пикселях
+                                (int)(StaticSize * factory.Size * 1.15)   // Высота в пикселях
                             );
                             Texture2D shadow = ContentMaster.Textures["Block"]["shadow"];
                             SpriteBatch.Draw(
@@ -216,10 +216,10 @@ namespace Factories_And_Guns
                 {
                     var unit = Field.FieldEquipment["ground"][name];
                     if (
-                        unit.WorldX >= WorldPosX - X2 &&
-                        unit.WorldX <= WorldPosX + X2 &&
-                        unit.WorldY >= WorldPosY - Y2 &&
-                        unit.WorldY <= WorldPosY + Y2
+                        unit.WorldX >= WorldPosX - X2 - unit.Size &&
+                        unit.WorldX <= WorldPosX + X2 + unit.Size &&
+                        unit.WorldY >= WorldPosY - Y2 - unit.Size &&
+                        unit.WorldY <= WorldPosY + Y2 + unit.Size
                     )
                     {
                         Texture2D body = ContentMaster.Textures[unit.TexturesFolderPath]["body"];
@@ -307,32 +307,35 @@ namespace Factories_And_Guns
                 var unit = Field.FieldEquipment["air"][type];
                 float height = unit.Height;
                 if (
-                    unit.WorldX >= WorldPosX + height - X2 &&
-                    unit.WorldX <= WorldPosX + height + X2 &&
-                    unit.WorldY >= WorldPosY - height - Y2 &&
-                    unit.WorldY <= WorldPosY - height + Y2
+                    unit.WorldX >= WorldPosX + height - X2 - unit.Size &&
+                    unit.WorldX <= WorldPosX + height + X2 + unit.Size &&
+                    unit.WorldY >= WorldPosY - height - Y2 - unit.Size &&
+                    unit.WorldY <= WorldPosY - height + Y2 + unit.Size
                 )
                 {
                     Texture2D shadow = ContentMaster.Textures[unit.TexturesFolderPath]["shadow"];
-                    Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
-                        (int)((unit.WorldX - WorldPosX + X2 - height) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
-                        (int)((unit.WorldY - WorldPosY + Y2 + height) * StaticSize), // Координата Y
-                        (int)(unit.Size * StaticSize),  // Ширина в пикселях
-                        (int)(unit.Size * (shadow.Height / shadow.Width) * StaticSize)   // Высота в пикселях
-                    );
-                    SpriteBatch.Draw(
-                        shadow,
-                        destinationRectangle,
-                        null,
-                        Color.White,
-                        unit.Rotation,
-                        new Vector2(
-                            (float)(shadow.Width / 2 * unit.OffsetX),
-                            (float)(shadow.Height / 2 * unit.OffsetY)
-                            ),
-                        SpriteEffects.None,
-                        0
-                    );
+                    if (shadow != null)
+                    {
+                        Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
+                            (int)((unit.WorldX - WorldPosX + X2 - height) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
+                            (int)((unit.WorldY - WorldPosY + Y2 + height) * StaticSize), // Координата Y
+                            (int)(unit.Size * StaticSize),  // Ширина в пикселях
+                            (int)(unit.Size * (shadow.Height / shadow.Width) * StaticSize)   // Высота в пикселях
+                        );
+                        SpriteBatch.Draw(
+                            shadow,
+                            destinationRectangle,
+                            null,
+                            Color.White,
+                            unit.Rotation,
+                            new Vector2(
+                                (float)(shadow.Width / 2 * unit.OffsetX),
+                                (float)(shadow.Height / 2 * unit.OffsetY)
+                                ),
+                            SpriteEffects.None,
+                            0
+                        );
+                    }
                 }
             }
 
@@ -341,10 +344,10 @@ namespace Factories_And_Guns
             {
                 var unit = Field.FieldEquipment["air"][type];
                 if (
-                    unit.WorldX >= WorldPosX - X2 &&
-                    unit.WorldX <= WorldPosX + X2 &&
-                    unit.WorldY >= WorldPosY - Y2 &&
-                    unit.WorldY <= WorldPosY + Y2
+                    unit.WorldX >= WorldPosX - X2 - unit.Size &&
+                    unit.WorldX <= WorldPosX + X2 + unit.Size &&
+                    unit.WorldY >= WorldPosY - Y2 - unit.Size &&
+                    unit.WorldY <= WorldPosY + Y2 + unit.Size
                 )
                 {
                     Texture2D body = ContentMaster.Textures[unit.TexturesFolderPath]["body"];

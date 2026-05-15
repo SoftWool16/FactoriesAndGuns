@@ -11,7 +11,6 @@ namespace Factories_And_Guns
 {
     public class Game1 : Game
     {
-        private float CameraSpeed = 10f;
         private Field Field;
 
         private GraphicsDeviceManager _graphics;
