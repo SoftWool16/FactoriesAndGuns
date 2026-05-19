@@ -13,30 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin ../../Desktop/модельки для MyMindustry/beta (tank)/tower.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Desktop/модельки для MyMindustry/beta (tank)/tower.png;Ground_Equipment/Beta/tower.png
-
-#begin ../../Desktop/модельки для MyMindustry/dragonfly (air)/propeller.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:../../Desktop/модельки для MyMindustry/dragonfly (air)/propeller.png;Air_Equipment/Dragonfly/propeller.png
-
 #begin ../../Desktop/модельки для MyMindustry/dragonfly (air)/shadow.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -121,6 +97,18 @@
 /processorParam:TextureFormat=Color
 /build:Air_Equipment/Dragonfly/body.png
 
+#begin Air_Equipment/Dragonfly/parts/propeller.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Air_Equipment/Dragonfly/parts/propeller.png;Air_Equipment/Dragonfly/parts/p0.png
+
 #begin Build/conveyors/body.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -155,7 +143,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Build/Elementary_drill/drill.png
+/build:Build/Elementary_drill/drill.png;Build/Elementary_drill/part0.png
 
 #begin Ground_Equipment/Beta/body.png
 /importer:TextureImporter
@@ -168,6 +156,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Ground_Equipment/Beta/body.png
+
+#begin Ground_Equipment/Beta/towers/tower.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Ground_Equipment/Beta/towers/tower.png;Ground_Equipment/Beta/towers/t0.png
 
 #begin User_Interface/arrows/arrow.png
 /importer:TextureImporter

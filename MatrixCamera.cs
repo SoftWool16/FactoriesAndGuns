@@ -120,7 +120,7 @@ namespace Factories_And_Guns
                                     (int)(StaticSize * effect.Size),  // Ширина в пикселях
                                     (int)(StaticSize * effect.Size)   // Высота в пикселях
                                 );
-                                Texture2D effect1 = ContentMaster.Textures[factory.TexturesFolderPath][factory.MovingParts.TextureName];
+                                Texture2D effect1 = ContentMaster.Textures[factory.TexturesFolderPath]["part0"];
                                 SpriteBatch.Draw(
                                     effect1,
                                     destinationRectangle,
@@ -245,10 +245,11 @@ namespace Factories_And_Guns
                         if (unit.Guns != null)
                         {
                             var gunsList = unit.Guns.Keys;
+                            int n = 0;
                             foreach (string nameGun in gunsList) // Отрисовка орудий ( если есть )
                             {
                                 Gun gun = unit.Guns[nameGun];
-                                Texture2D gunT = ContentMaster.Textures[unit.TexturesFolderPath][gun.TextureName];
+                                Texture2D gunT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/towers"][$"t{n}"];
                                 Rectangle destinationRectangleGuns = new( // 4-х угольник, на который будет надета текстура
                                 (int)((unit.WorldX + gun.OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
                                 (int)((unit.WorldY + gun.OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
@@ -268,15 +269,17 @@ namespace Factories_And_Guns
                                     SpriteEffects.None,
                                     0
                                 );
+                            n++;
                             }
                         }
                         if (unit.MovingParts != null)
                         {
                             var effectList = unit.MovingParts.Keys;
+                            int n = 0;
                             foreach (string nameEffect in effectList) // Отрисовка эффектов ( если есть )
                             {
                                 MovingParts effect = unit.MovingParts[nameEffect];
-                                Texture2D effectT = ContentMaster.Textures[unit.TexturesFolderPath][effect.TextureName];
+                                Texture2D effectT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/parts"][$"p{n}"];
                                 Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
                                 (int)((unit.WorldX + effect.OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
                                 (int)((unit.WorldY + effect.OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
@@ -296,6 +299,7 @@ namespace Factories_And_Guns
                                     SpriteEffects.None,
                                     0
                                 );
+                                n++;
                             }
                         }
                     }
@@ -373,10 +377,11 @@ namespace Factories_And_Guns
                     if (unit.Guns != null)
                     {
                         var gunsList = unit.Guns.Keys;
+                        int n = 0;
                         foreach (string nameGun in gunsList) // Отрисовка орудий ( если есть )
                         {
                             Gun gun = unit.Guns[nameGun];
-                            Texture2D gunT = ContentMaster.Textures[unit.TexturesFolderPath][gun.TextureName];
+                            Texture2D gunT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/towers"][$"t{n}"];
                             Rectangle destinationRectangleGuns = new( // 4-х угольник, на который будет надета текстура
                             (int)((unit.WorldX + gun.OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
                             (int)((unit.WorldY + gun.OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
@@ -396,21 +401,23 @@ namespace Factories_And_Guns
                                 SpriteEffects.None,
                                 0
                             );
+                            n++;
                         }
                     }
                     if (unit.MovingParts != null)
                     {
                         var effectList = unit.MovingParts.Keys;
+                        int n = 0;
                         foreach (string nameEffect in effectList) // Отрисовка эффектов ( если есть )
                         {
                             MovingParts effect = unit.MovingParts[nameEffect];
-                            Texture2D effectT = ContentMaster.Textures[unit.TexturesFolderPath][effect.TextureName];
+                            Texture2D effectT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/parts"][$"p{n}"];
                             Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
                             (int)((unit.WorldX + effect.OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
                             (int)((unit.WorldY + effect.OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
                             (int)(effect.Size * StaticSize),  // Ширина в пикселях
                             (int)(effect.Size * (effectT.Height / effectT.Width) * StaticSize)   // Высота в пикселях
-                        );
+                            );
                             SpriteBatch.Draw(
                                 effectT,
                                 destinationRectangleEffects,
@@ -424,12 +431,11 @@ namespace Factories_And_Guns
                                 SpriteEffects.None,
                                 0
                             );
+                            n++;
                         }
                     }
                 }
             }
         }
     }
-
-    //public class Interface()
 }

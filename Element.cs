@@ -3,145 +3,38 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
+using System.Drawing;
 
 namespace Factories_And_Guns
 {
-    public class Element(string name, string texturePath)
+    public class Element(string Name, string texturePath)
     {
-        public string Name { get; set; } = name;
+        public string Name { get; set; } = Name;
         public string TexturesFolderPath { get; set; } = texturePath;
     }
-
-    public enum MovingPartsType
+    public class Parameters(float size, float offsetX, float offsetY, float maxSpeedRotation)
     {
-        rotation,
-        shaking,
-        movement
-    }
-
-    public enum EquipmentMoveType
-    {
-        tracked,
-        walking,
-        hovering,
-        swimming
-    }
-
-    public class Bullet(string textureName, float size)
-    {
-        public string TextureName { get; set; } = textureName;
         public float Rotation { get; set; } = 0;
         public float WorldX { get; set; } = 0;
         public float WorldY { get; set; } = 0;
         public float Size { get; set; } = size;
-        public void BulletUpdate(float dt)
+        public float OffsetX { get; set; } = offsetX;
+        public float OffsetY { get; set; } = offsetY;
+        public float MaxSpeedRotation { get; set; } = maxSpeedRotation;
+
+        public Vector2 DirectionFromAngle() // получение вектора движения из поворота
         {
-            
+            // Если нужно, «обернём» угол в диапазон [-p, p] – это не обязательно,  ( здесь p - число пи )
+            // но убирает лишние большие значения.
+            //Rotation = MathHelper.WrapAngle(Rotation);
+
+            float y = MathF.Cos(Rotation); // [-1, 1]
+            float x = MathF.Sin(Rotation); // [-1, 1]
+
+            // Косинус/синус уже дают единичный вектор, но можно гарантировать нормализацию:
+            // return Vector2.Normalize(new Vector2(x, y));
+            return new Vector2(x, -y);
         }
-    }
-    public class Gun(string textureName, float offsetCenterX, float offsetCenterY, int damage, Bullet bullet, float rate_of_fire, float speedBullet, float speedRotation, float size)
-    {
-        public string TextureName { get; set; } = textureName;
-        public float Rotation { get; set; } = 0;
-        public float OffsetX { get; set; } = offsetCenterX;
-        public float OffsetY { get; set; } = offsetCenterY;
-        public int Damage { get; set; } = damage;
-        public Bullet Bullet { get; set; } = bullet;
-        public float Rate_of_fire { get; set; } = rate_of_fire;
-        public float SpeedBullet {get; set;} = speedBullet;
-        public float SpeedRotation { get; set;} = speedRotation;
-        public float Size { get; set; } = size;
-    }
-
-    public class MovingParts (string textureName, float offsetCenterX, float offsetCenterY, float speedEffect, MovingPartsType movingPartsType, float size)
-    {
-        public string TextureName { get; set; } = textureName;
-        public float SpeedEffect {  get; set; } = speedEffect;
-        public MovingPartsType MovingPartsType { get; set; } = movingPartsType;
-        public float Rotation { get; set; } = 0;
-        public float OffsetX { get; set; } = offsetCenterX;
-        public float OffsetY { get; set; } = offsetCenterY;
-        public float Size { get; set; } = size;
-        public void MovingPartsUpdate(float dt)
-        {
-            if (MovingPartsType == MovingPartsType.rotation)
-            {
-                float r = Rotation + SpeedEffect * dt;
-                if (r >= 360)
-                {
-                    float r1 = 360 - r;
-                    Rotation = r1;
-                }
-                else Rotation = r;
-            }
-            //else if (EffectType == EffectType.shaking) 
-        }
-    }
-
-    public class Equipment : Element
-    {
-        public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float friction, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType, int maxHeightToBeOvercome, int maxDepthToBeOvercome) : base(name, textureFolderPath)
-        {
-            Health = maxHealth;
-            WorldX = X;
-            WorldY = Y;
-            Guns = guns;
-            MovingParts = movingParts;
-            MaxSpeed = maxSpeed;
-            Acceleration = acceleration;
-            Friction = friction;
-            MaxSpeedRotation = maxSpeedRotation;
-            MoveType = moveType;
-            OffsetX = offsetCenterX;
-            OffsetY = offsetCenterY;
-            Size = size;
-            MaxHeightToBeOvercome = maxHeightToBeOvercome;
-            MaxDepthToBeOvercome = maxDepthToBeOvercome;
-        }
-
-        public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType) : base(name, textureFolderPath)
-        {
-            Health = maxHealth;
-            WorldX = X;
-            WorldY = Y;
-            Guns = guns;
-            MovingParts = movingParts;
-            MaxSpeed = maxSpeed;
-            Acceleration = acceleration;
-            Friction = acceleration;
-            MaxSpeedRotation = maxSpeedRotation;
-            MoveType = moveType;
-            OffsetX = offsetCenterX;
-            OffsetY = offsetCenterY;
-            Size = size;
-            MaxHeightToBeOvercome = -1;
-            MaxDepthToBeOvercome = -1;
-        }
-
-        public float Health { get; set; }  // Текущее здоровье
-        public float WorldX { get; set; }  // Позиция по X относительно мира
-        public float WorldY { get; set; }  // Позиция по Y относительно мира
-        public Dictionary<string, Gun> Guns { get; set; }  // Список орудий
-        public Dictionary<string, MovingParts> MovingParts { get; set; }  // Список постоянных эффектов
-        public float MaxSpeed { get; set; }  // Максимальная скорость передвижения
-        public float Rotation { get; set; } = 0; // Текущий поворот корпуса
-        public float MaxSpeedRotation { get; set; }  // Максимальная скорость поворота корпуса
-        public Vector2 Velocity { get; set; } = Vector2.Zero; // Текущая скорость
-        public float Acceleration { get; set; }  // Ускорение
-        public float Friction { get; set; }      // Замедление
-        public float Size { get; set; }   // Размер ( в блоках )
-        public float OffsetX { get; set; }  // Смещение центра по X относительно текстуры
-        public float OffsetY { get; set; }  // Смещение центра по Y относительно текстуры
-        public EquipmentMoveType MoveType { get; set; }  // Тип передвижения
-        public float WorldPointX { get; set; } = -1;  // Точка X для перемещения в неё
-        public float WorldPointY { get; set; } = -1;  // Точка Y для перемещения в неё
-
-        public int MaxHeightToBeOvercome { get; set; } // Максимальная проходимая высота
-        public int MaxDepthToBeOvercome { get; set; } // Максимальная проходимая глубина
-
-        public float Height { get; set; } = 3; // Высота полёта ( для воздушных )
-
         public void SmoothRotation(Vector2 vector2, float dt) // Плавный поворот
         {
             // Зависит от того, куда смотрит "нос" вашего спрайта по умолчанию.
@@ -159,19 +52,120 @@ namespace Factories_And_Guns
             //Обновляем угол и снова «заворачиваем», чтобы он оставался в [-p, p] ( здесь p - число пи )
             Rotation = MathHelper.WrapAngle(Rotation + step);
         }
-        public Vector2 DirectionFromAngle() // получение вектора движения из поворота
+    }
+
+    public enum MovingPartsType
+    {
+        rotation,
+        shaking,
+        movement
+    }
+
+    public enum EquipmentMoveType
+    {
+        tracked,
+        walking,
+        hovering,
+        swimming
+    }
+
+    public class TypeBullet(float size, float maxSpeedRotation) : Parameters(size, 0, 0, maxSpeedRotation)
+    {
+        public void BulletUpdate(float dt)
         {
-            // Если нужно, «обернём» угол в диапазон [-p, p] – это не обязательно,  ( здесь p - число пи )
-            // но убирает лишние большие значения.
-            //Rotation = MathHelper.WrapAngle(Rotation);
-
-            float y = MathF.Cos(Rotation); // [-1, 1]
-            float x = MathF.Sin(Rotation); // [-1, 1]
-
-            // Косинус/синус уже дают единичный вектор, но можно гарантировать нормализацию:
-            // return Vector2.Normalize(new Vector2(x, y));
-            return new Vector2(x, -y);
+            
         }
+    }
+    public class Gun(float offsetCenterX, float offsetCenterY, int damage, TypeBullet bullet, float rate_of_fire, float speedBullet, float speedRotation, float size, float maxBackfiring, float backfiring) : Parameters(size, offsetCenterX, offsetCenterY, speedRotation)
+    {
+        public int Damage { get; set; } = damage;
+        public TypeBullet _TypeBullet { get; set; } = bullet;
+        public float Rate_of_fire { get; set; } = rate_of_fire;
+        public float SpeedBullet {get; set;} = speedBullet;
+        public float MaxBackfiring {  get; set; } = maxBackfiring;
+        public float Backfiring { get; set; } = backfiring;
+        public Vector2 CurrentBackfiring { get; set; } = Vector2.Zero;
+
+        public void GunUpdate(float dt)
+        {
+            //if (Backfiring <= MaxBackfiring - Backfiring) 
+        }
+    }
+
+    public class MovingParts (float offsetCenterX, float offsetCenterY, float speedEffect, MovingPartsType movingPartsType, float size) : Parameters(size, offsetCenterX, offsetCenterY, 0)
+    {
+        public float SpeedEffect {  get; set; } = speedEffect;
+        public MovingPartsType MovingPartsType { get; set; } = movingPartsType;
+        public void MovingPartsUpdate(float dt)
+        {
+            if (MovingPartsType == MovingPartsType.rotation)
+            {
+                float r = Rotation + SpeedEffect * dt;
+                if (r >= 360)
+                {
+                    float r1 = 360 - r;
+                    Rotation = r1;
+                }
+                else Rotation = r;
+            }
+            //else if (EffectType == EffectType.shaking) 
+        }
+    }
+
+    public class Equipment : Parameters
+    {
+        public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float friction, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType, int maxHeightToBeOvercome, int maxDepthToBeOvercome) : base(size, offsetCenterX, offsetCenterY, maxSpeedRotation)
+        {
+            Health = maxHealth;
+            WorldX = X;
+            WorldY = Y;
+            Guns = guns;
+            MovingParts = movingParts;
+            MaxSpeed = maxSpeed;
+            Acceleration = acceleration;
+            Friction = friction;
+            MoveType = moveType;
+            MaxHeightToBeOvercome = maxHeightToBeOvercome;
+            MaxDepthToBeOvercome = maxDepthToBeOvercome;
+            NameEquipment = name;
+            TexturesFolderPath = textureFolderPath;
+        }
+
+        public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType) : base(size, offsetCenterX, offsetCenterY, maxSpeedRotation)
+        {
+            Health = maxHealth;
+            WorldX = X;
+            WorldY = Y; 
+            Guns = guns;
+            MovingParts = movingParts;
+            MaxSpeed = maxSpeed;
+            Acceleration = acceleration;
+            Friction = acceleration;
+            MoveType = moveType;
+            MaxHeightToBeOvercome = -1;
+            MaxDepthToBeOvercome = -1;
+            NameEquipment = name;
+            TexturesFolderPath = textureFolderPath;
+        }
+
+        public float Health { get; set; }  // Текущее здоровье
+        public string NameEquipment { get; set; } // Игровое имя
+        public string TexturesFolderPath { get; set; } // Путь к папке с текстурами
+        public Dictionary<string, Gun> Guns { get; set; }  // Список орудий
+        public Dictionary<string, MovingParts> MovingParts { get; set; }  // Список постоянных эффектов
+        public float MaxSpeed { get; set; }  // Максимальная скорость передвижения
+        public Vector2 Velocity { get; set; } = Vector2.Zero; // Текущая скорость
+        public float Acceleration { get; set; }  // Ускорение
+        public float Friction { get; set; }      // Замедление
+        public EquipmentMoveType MoveType { get; set; }  // Тип передвижения
+        public float WorldPointX { get; set; } = -1;  // Точка X для перемещения в неё
+        public float WorldPointY { get; set; } = -1;  // Точка Y для перемещения в неё
+
+        public int MaxHeightToBeOvercome { get; set; } // Максимальная проходимая высота
+        public int MaxDepthToBeOvercome { get; set; } // Максимальная проходимая глубина
+
+        public float Height { get; set; } = 3; // Высота полёта ( для воздушных )
+
         public void InputHalderEquipment(KeyboardState key ,float dt)
         {
             // Направляющий вектор ( (0,0) если нет ввода )

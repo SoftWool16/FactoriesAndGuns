@@ -13,7 +13,7 @@ namespace Factories_And_Guns
         public Element[,] FieldBackground = null;                              // Фон
         public BaseFactory[,] FieldBuild = null;                               // Постройки
         public Dictionary<string, Dictionary<string, Equipment>> FieldEquipment = []; // Техника
-        public Bullet[] BulletList = [];                                // Снаряды
+        public TypeBullet[] BulletList = [];                                // Снаряды
         public int SizeX { get; set; } = 0;
         public int SizeY { get; set; } = 0;
         public Equipment CurrentEquipment { get; set; } = null;
@@ -66,7 +66,7 @@ namespace Factories_And_Guns
             FieldEquipment["ground"] = [];
             FieldEquipment["air"] = [];
 
-            MovingParts effects1 = new("drill", 0, 0, 2, MovingPartsType.rotation, 2);
+            MovingParts effects1 = new(0, 0, 2, MovingPartsType.rotation, 2);
             Dictionary<string, Element> elementsOut = [];
             elementsOut["metal"] = new("metal1", "metal");
             FieldBuild[8, 8] = new("Elementary_drill", "Build/Elementary_drill", 2, effects1, null, null, elementsOut, 100, 10);
@@ -75,12 +75,12 @@ namespace Factories_And_Guns
             //FieldBuild[10, 8] = new("conveyor1", "conveyor", 1, effects2, null, null, null, 100, 10);
 
             Dictionary<string, Gun> tower = [];
-            Bullet bullet = new("bullet1", 0.1f);
-            tower["tower1"] = new Gun("tower", 0, -1.3f, 100, bullet, 0.1f, 3, 4, 1.2f);
+            TypeBullet bullet = new(0.1f, 7);
+            tower["tower1"] = new Gun(0, -1.3f, 100, bullet, 0.1f, 3, 4, 1.2f, 0.3f, 0.05f);
             FieldEquipment["ground"]["beta1"] = new Equipment(1, 1, 1.8f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, null, 20, 20, 50, 6, 1000, EquipmentMoveType.tracked, 0, 1);
 
             Dictionary<string, MovingParts> effects = []; // Создание списка с подвижными частями
-            effects["effect1"] = new MovingParts("propeller", 0, 0, 15, MovingPartsType.rotation, 4.6f);
+            effects["effect1"] = new MovingParts(0, 0, 15, MovingPartsType.rotation, 4.6f);
             FieldEquipment["air"]["dragonfly1"] = new Equipment(1, 0.6f, 4.6f, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 25, 40, 5, 300, EquipmentMoveType.hovering);
 
             CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
@@ -98,7 +98,7 @@ namespace Factories_And_Guns
                 if (CurrentEquipment != FieldEquipment["air"]["dragonfly1"]) CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
             }
 
-            if (key.IsKeyDown(Keys.D2))
+            else if (key.IsKeyDown(Keys.D2))
             {
                 if (CurrentEquipment != FieldEquipment["ground"]["beta1"]) CurrentEquipment = FieldEquipment["ground"]["beta1"];
             }
@@ -108,7 +108,7 @@ namespace Factories_And_Guns
                 MatrixCamera.SizeY *= 1.05f;
                 MatrixCamera.SizeX *= 1.05f;
             }
-            if (key.IsKeyDown(Keys.Down) && MatrixCamera.SizeY > 30)
+            else if (key.IsKeyDown(Keys.Down) && MatrixCamera.SizeY > 30)
             {
                 MatrixCamera.SizeY /= 1.05f;
                 MatrixCamera.SizeX /= 1.05f;
