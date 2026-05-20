@@ -22,9 +22,9 @@ namespace Factories_And_Guns
             float X2 = SizeX / 2;
             float Y2 = SizeY / 2;
 
-            for (int i = -(int)X2; i < X2; i++) // Отрисовка фона
+            for (int i = -(int)X2 - 1; i < X2 + 1; i++) // Отрисовка фона
             {
-                for (int j = -(int)Y2; j < Y2; j++)
+                for (int j = -(int)Y2 - 1; j < Y2 + 1; j++)
                 {
                     if (
                         j + (int)WorldPosY >= 0 &&
@@ -216,10 +216,10 @@ namespace Factories_And_Guns
                 {
                     var unit = Field.FieldEquipment["ground"][name];
                     if (
-                        unit.WorldX >= WorldPosX - X2 - unit.Size &&
-                        unit.WorldX <= WorldPosX + X2 + unit.Size &&
-                        unit.WorldY >= WorldPosY - Y2 - unit.Size &&
-                        unit.WorldY <= WorldPosY + Y2 + unit.Size
+                        unit.WorldX >= WorldPosX - X2 - (unit.Size / 2) &&
+                        unit.WorldX <= WorldPosX + X2 + (unit.Size / 2) &&
+                        unit.WorldY >= WorldPosY - Y2 - (unit.Size / 2) &&
+                        unit.WorldY <= WorldPosY + Y2 + (unit.Size / 2)
                     )
                     {
                         Texture2D body = ContentMaster.Textures[unit.TexturesFolderPath]["body"];
@@ -311,10 +311,10 @@ namespace Factories_And_Guns
                 var unit = Field.FieldEquipment["air"][type];
                 float height = unit.Height;
                 if (
-                    unit.WorldX >= WorldPosX + height - X2 - unit.Size &&
-                    unit.WorldX <= WorldPosX + height + X2 + unit.Size &&
-                    unit.WorldY >= WorldPosY - height - Y2 - unit.Size &&
-                    unit.WorldY <= WorldPosY - height + Y2 + unit.Size
+                    unit.WorldX >= WorldPosX + height - X2 - (unit.Size / 2) &&
+                    unit.WorldX <= WorldPosX + height + X2 + (unit.Size / 2) &&
+                    unit.WorldY >= WorldPosY - height - Y2 - (unit.Size / 2) &&
+                    unit.WorldY <= WorldPosY - height + Y2 + (unit.Size / 2)
                 )
                 {
                     Texture2D shadow = ContentMaster.Textures[unit.TexturesFolderPath]["shadow"];

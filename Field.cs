@@ -120,7 +120,37 @@ namespace Factories_And_Guns
                 var unitList = FieldEquipment[type].Keys;
                 foreach (string name in unitList)
                 {
-                    FieldEquipment[type][name].Update(dt);
+                    bool x = true;
+                    bool y = true;
+                    var unit = FieldEquipment[type][name];
+                    if (unit.Type == "ground") // ≈сли единица наземна€ - обработка столкновений
+                    {
+                        float vX = unit.Velocity.X;
+                        float vY = unit.Velocity.Y;
+
+                        float unitSizeX = unit.Size / 2;
+                        float unitSizeY = unit.Size / 2;
+
+                        if (vX < 0) unitSizeX = -unitSizeX;
+                        if (vY < 0) unitSizeY = -unitSizeY;
+
+                        float uX = unit.WorldX + vX * dt + unitSizeX;
+                        float uY = unit.WorldY + vY * dt + unitSizeY;
+
+                        if (uX > 0 && uX < SizeX)
+                        {
+                            if (FieldBuild[(int)uX,
+                                (int)unit.WorldY] != null) x = false;
+                        } else { x = false; }
+
+                        if (uY > 0 && uY < SizeY)
+                        {
+                            if (FieldBuild[(int)unit.WorldX,
+                                (int)uY] != null) y = false;
+                        } else {  y = false; }
+                    }
+                    if (CurrentEquipment != unit) unit.SmoothStop(dt);
+                    unit.Update(dt, x, y);
                 }
             }
 

@@ -129,6 +129,7 @@ namespace Factories_And_Guns
             MaxDepthToBeOvercome = maxDepthToBeOvercome;
             NameEquipment = name;
             TexturesFolderPath = textureFolderPath;
+            Type = "ground";
         }
 
         public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType) : base(size, offsetCenterX, offsetCenterY, maxSpeedRotation)
@@ -146,8 +147,10 @@ namespace Factories_And_Guns
             MaxDepthToBeOvercome = -1;
             NameEquipment = name;
             TexturesFolderPath = textureFolderPath;
+            Type = "air";
         }
 
+        public string Type { get; set; } // Тип
         public float Health { get; set; }  // Текущее здоровье
         public string NameEquipment { get; set; } // Игровое имя
         public string TexturesFolderPath { get; set; } // Путь к папке с текстурами
@@ -220,25 +223,29 @@ namespace Factories_And_Guns
             }
             else
             {
-                if (Velocity.Length() > 0f)
-                {
-                    // Уменьшаем модуль скорости
-                    float speed = Velocity.Length();
-                    speed -= Friction * dt;
-                    speed = Math.Max(speed, 0f);
-
-                    // Сохраняем направление
-                    if (speed == 0f)
-                        Velocity = Vector2.Zero;
-                    else
-                        Velocity = Vector2.Normalize(Velocity) * speed;
-                }
+                SmoothStop(dt);
             }
 
             MatrixCamera.WorldPosX = WorldX;
             MatrixCamera.WorldPosY = WorldY;
         }
-        public void Update(float dt)
+        public void SmoothStop(float dt)
+        {
+            if (Velocity.Length() > 0f)
+            {
+                // Уменьшаем модуль скорости
+                float speed = Velocity.Length();
+                speed -= Friction * dt;
+                speed = Math.Max(speed, 0f);
+
+                // Сохраняем направление
+                if (speed == 0f)
+                    Velocity = Vector2.Zero;
+                else
+                    Velocity = Vector2.Normalize(Velocity) * speed;
+            }
+        }
+        public void Update(float dt, bool x, bool y)
         {
             if (MovingParts != null) // Обновление эффектов
             {
@@ -246,11 +253,11 @@ namespace Factories_And_Guns
                 foreach (var effect in unitEffectList) MovingParts[effect].MovingPartsUpdate(dt);
             }
 
-            if (Velocity != Vector2.Zero) // Обновление движения
-            {
-                WorldX += Velocity.X * dt;
-                WorldY += Velocity.Y * dt;
-            }
+            // Обновление движения
+            if (Velocity != Vector2.Zero && x == true) WorldX += Velocity.X * dt;
+            else Velocity = new Vector2(0, Velocity.Y);
+            if (Velocity != Vector2.Zero && y == true) WorldY += Velocity.Y * dt;
+            else Velocity = new Vector2(Velocity.X, 0);
         }
     }
 
