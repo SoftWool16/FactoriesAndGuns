@@ -66,7 +66,7 @@ namespace Factories_And_Guns
             FieldEquipment["ground"] = [];
             FieldEquipment["air"] = [];
 
-            MovingParts effects1 = new(0, 0, 2, MovingPartsType.rotation, 2);
+            MovingParts effects1 = new(0, 0, 0, 0, 2, MovingPartsType.rotation, 2);
             Dictionary<string, Element> elementsOut = [];
             elementsOut["metal"] = new("metal1", "metal");
             FieldBuild[8, 8] = new("Elementary_drill", "Build/Elementary_drill", 2, effects1, null, null, elementsOut, 100, 10);
@@ -76,12 +76,12 @@ namespace Factories_And_Guns
 
             Dictionary<string, Gun> tower = [];
             TypeBullet bullet = new(0.1f, 7);
-            tower["tower1"] = new Gun(0, -1.3f, 100, bullet, 0.1f, 3, 4, 1.2f, 0.3f, 0.05f);
-            FieldEquipment["ground"]["beta1"] = new Equipment(1, 1, 1.8f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, null, 20, 20, 50, 6, 1000, EquipmentMoveType.tracked, 0, 1);
+            tower["tower1"] = new Gun(1, 1.6f, 0, 0, 100, bullet, 0.1f, 3, 4, 1.2f, 0.3f, 0.05f);
+            FieldEquipment["ground"]["beta1"] = new Equipment(1, 1, 0, 0, 1.8f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, null, 20, 20, 50, 6, 1000, EquipmentMoveType.tracked, 0, 1);
 
             Dictionary<string, MovingParts> effects = []; // Создание списка с подвижными частями
-            effects["effect1"] = new MovingParts(0, 0, 15, MovingPartsType.rotation, 4.6f);
-            FieldEquipment["air"]["dragonfly1"] = new Equipment(1, 0.6f, 4.6f, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 25, 40, 5, 300, EquipmentMoveType.hovering);
+            effects["effect1"] = new MovingParts(1, 1, 0, 0, 15, MovingPartsType.rotation, 4.6f);
+            FieldEquipment["air"]["dragonfly1"] = new Equipment(1, 0.6f, 0, 0, 4.6f, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 25, 40, 5, 300, EquipmentMoveType.hovering);
 
             CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
         }
@@ -89,9 +89,12 @@ namespace Factories_And_Guns
         {
             var key = Keyboard.GetState();
 
+            var mouseState = Mouse.GetState();
+            MatrixCamera.UpdateMousePos(mouseState);
+
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            CurrentEquipment?.InputHalderEquipment(key, dt);
+            CurrentEquipment?.InputHalderEquipment(key, mouseState, dt);
 
             if (key.IsKeyDown(Keys.D1))
             {
@@ -150,7 +153,19 @@ namespace Factories_And_Guns
                         } else {  y = false; }
                     }
                     if (CurrentEquipment != unit) unit.SmoothStop(dt);
-                    unit.Update(dt, x, y);
+
+                    Vector2 mousePos = Vector2.Zero;
+
+                    if (CurrentEquipment == unit)
+                    {
+                        mousePos = new
+                        (
+                            MatrixCamera.WorldMousePosX,
+                            MatrixCamera.WorldMousePosY
+                        );
+                    }
+
+                    unit.Update(dt, x, y, mousePos);
                 }
             }
 

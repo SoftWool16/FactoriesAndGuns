@@ -12,14 +12,16 @@ namespace Factories_And_Guns
         public string Name { get; set; } = Name;
         public string TexturesFolderPath { get; set; } = texturePath;
     }
-    public class Parameters(float size, float offsetX, float offsetY, float maxSpeedRotation)
+    public class Parameters(float size, float offsetCenterX, float offsetCenterY, float offsetPosX, float offsetPosY, float maxSpeedRotation)
     {
         public float Rotation { get; set; } = 0;
         public float WorldX { get; set; } = 0;
         public float WorldY { get; set; } = 0;
         public float Size { get; set; } = size;
-        public float OffsetX { get; set; } = offsetX;
-        public float OffsetY { get; set; } = offsetY;
+        public float OffsetCenterX { get; set; } = offsetCenterX;
+        public float OffsetCenterY { get; set; } = offsetCenterY;
+        public float OffsetPosX { get; set; } = offsetPosX;
+        public float OffsetPosY { get; set; } = offsetPosY;
         public float MaxSpeedRotation { get; set; } = maxSpeedRotation;
 
         public Vector2 DirectionFromAngle() // получение вектора движения из поворота
@@ -69,14 +71,14 @@ namespace Factories_And_Guns
         swimming
     }
 
-    public class TypeBullet(float size, float maxSpeedRotation) : Parameters(size, 0, 0, maxSpeedRotation)
+    public class TypeBullet(float size, float maxSpeedRotation) : Parameters(size, 0, 0, 0, 0, maxSpeedRotation)
     {
         public void BulletUpdate(float dt)
         {
             
         }
     }
-    public class Gun(float offsetCenterX, float offsetCenterY, int damage, TypeBullet bullet, float rate_of_fire, float speedBullet, float speedRotation, float size, float maxBackfiring, float backfiring) : Parameters(size, offsetCenterX, offsetCenterY, speedRotation)
+    public class Gun(float offsetCenterX, float offsetCenterY, float offsetPosX, float offsetPosY, int damage, TypeBullet bullet, float rate_of_fire, float speedBullet, float speedRotation, float size, float maxBackfiring, float backfiring) : Parameters(size, offsetCenterX, offsetCenterY, offsetPosX, offsetPosY, speedRotation)
     {
         public int Damage { get; set; } = damage;
         public TypeBullet _TypeBullet { get; set; } = bullet;
@@ -92,7 +94,7 @@ namespace Factories_And_Guns
         }
     }
 
-    public class MovingParts (float offsetCenterX, float offsetCenterY, float speedEffect, MovingPartsType movingPartsType, float size) : Parameters(size, offsetCenterX, offsetCenterY, 0)
+    public class MovingParts (float offsetCenterX, float offsetCenterY, float offsetPosX, float offsetPosY, float speedEffect, MovingPartsType movingPartsType, float size) : Parameters(size, offsetCenterX, offsetCenterY, offsetPosX, offsetPosY, 0)
     {
         public float SpeedEffect {  get; set; } = speedEffect;
         public MovingPartsType MovingPartsType { get; set; } = movingPartsType;
@@ -114,7 +116,7 @@ namespace Factories_And_Guns
 
     public class Equipment : Parameters
     {
-        public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float friction, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType, int maxHeightToBeOvercome, int maxDepthToBeOvercome) : base(size, offsetCenterX, offsetCenterY, maxSpeedRotation)
+        public Equipment(float offsetCenterX, float offsetCenterY, float offsetPosX, float offsetPosY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float friction, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType, int maxHeightToBeOvercome, int maxDepthToBeOvercome) : base(size, offsetCenterX, offsetCenterY, offsetPosX, offsetPosY, maxSpeedRotation)
         {
             Health = maxHealth;
             WorldX = X;
@@ -132,7 +134,7 @@ namespace Factories_And_Guns
             Type = "ground";
         }
 
-        public Equipment(float offsetCenterX, float offsetCenterY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType) : base(size, offsetCenterX, offsetCenterY, maxSpeedRotation)
+        public Equipment(float offsetCenterX, float offsetCenterY, float offsetPosX, float offsetPosY, float size, string name, float X, float Y, string textureFolderPath, Dictionary<string, Gun> guns, Dictionary<string, MovingParts> movingParts, float maxSpeed, float acceleration, float maxSpeedRotation, float maxHealth, EquipmentMoveType moveType) : base(size, offsetCenterX, offsetCenterY, offsetPosX, offsetPosY, maxSpeedRotation)
         {
             Health = maxHealth;
             WorldX = X;
@@ -169,7 +171,7 @@ namespace Factories_And_Guns
 
         public float Height { get; set; } = 3; // Высота полёта ( для воздушных )
 
-        public void InputHalderEquipment(KeyboardState key ,float dt)
+        public void InputHalderEquipment(KeyboardState key, MouseState mouse, float dt)
         {
             // Направляющий вектор ( (0,0) если нет ввода )
             Vector2 move = Vector2.Zero;
@@ -245,7 +247,7 @@ namespace Factories_And_Guns
                     Velocity = Vector2.Normalize(Velocity) * speed;
             }
         }
-        public void Update(float dt, bool x, bool y)
+        public void Update(float dt, bool x, bool y, Vector2 mousePos)
         {
             if (MovingParts != null) // Обновление эффектов
             {
@@ -258,6 +260,19 @@ namespace Factories_And_Guns
             else Velocity = new Vector2(0, Velocity.Y);
             if (Velocity != Vector2.Zero && y == true) WorldY += Velocity.Y * dt;
             else Velocity = new Vector2(Velocity.X, 0);
+
+            if (mousePos != Vector2.Zero)
+            {
+                // Обработка орудий
+                float atan2 = MathF.Atan2(mousePos.X, -mousePos.Y);
+                if (Guns != null)
+                {
+                    foreach (string gun in Guns.Keys)
+                    {
+                        Guns[gun].SmoothRotation(mousePos, dt);
+                    }
+                }
+            }
         }
     }
 

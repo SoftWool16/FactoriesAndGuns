@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Factories_And_Guns
 {
@@ -7,6 +8,8 @@ namespace Factories_And_Guns
     {
         static public float WorldPosX { get; set; } = 0; // Координаты камеры
         static public float WorldPosY { get; set; } = 0;
+        static public float WorldMousePosX { get; set; } = 0;
+        static public float WorldMousePosY { get; set; } = 0;
         static public float SizeX { get; set; } = 60; // Кол-во блоков, которых нужно отрисовать по X
         static public float SizeY { get; set; } = 30; // Кол-во блоков, которых нужно отрисовать по Y
         static public SpriteBatch SpriteBatch { get; set; }
@@ -14,6 +17,11 @@ namespace Factories_And_Guns
         static public Field Field { get; set; }
         static public float StaticSize { get; set; } = 50; // Масштаб
 
+        static public void UpdateMousePos(MouseState state)
+        {
+            WorldMousePosX = state.X / StaticSize + WorldPosX - (SizeX / 2);
+            WorldMousePosY = state.Y / StaticSize + WorldPosY - (SizeY / 2);
+        }
         static public void RenderMatrix()
         {
             StaticSize = GameWindow.ClientBounds.Width / SizeX; // Установка масштаба объектов с учётом кол-ва блоков, которых нужно отрисовать по X ( ширина_окна_в_пикселях / кол-во_блоков.по_X )
@@ -236,8 +244,8 @@ namespace Factories_And_Guns
                             Color.White,
                             unit.Rotation,
                             new Vector2(
-                                (float)(body.Width / 2 * unit.OffsetX),
-                                (float)(body.Height / 2 * unit.OffsetY)
+                                (float)(body.Width / 2 * unit.OffsetCenterX),
+                                (float)(body.Height / 2 * unit.OffsetCenterY)
                                 ),
                             SpriteEffects.None,
                             0
@@ -251,8 +259,8 @@ namespace Factories_And_Guns
                                 Gun gun = unit.Guns[nameGun];
                                 Texture2D gunT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/towers"][$"t{n}"];
                                 Rectangle destinationRectangleGuns = new( // 4-х угольник, на который будет надета текстура
-                                (int)((unit.WorldX + gun.OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
-                                (int)((unit.WorldY + gun.OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
+                                (int)((unit.WorldX + gun.OffsetPosX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                                (int)((unit.WorldY + gun.OffsetPosY - WorldPosY + Y2) * StaticSize), // Координата Y
                                 (int)(gun.Size * StaticSize),  // Ширина в пикселях
                                 (int)(gun.Size * (gunT.Height / gunT.Width) * StaticSize)   // Высота в пикселях
                                 );
@@ -263,8 +271,8 @@ namespace Factories_And_Guns
                                     Color.White,
                                     gun.Rotation,
                                     new Vector2(
-                                        gunT.Width / 2,
-                                        gunT.Height / 2
+                                        gunT.Width / 2 * gun.OffsetCenterX,
+                                        gunT.Height / 2 * gun.OffsetCenterY
                                         ),
                                     SpriteEffects.None,
                                     0
@@ -281,8 +289,8 @@ namespace Factories_And_Guns
                                 MovingParts effect = unit.MovingParts[nameEffect];
                                 Texture2D effectT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/parts"][$"p{n}"];
                                 Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
-                                (int)((unit.WorldX + effect.OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
-                                (int)((unit.WorldY + effect.OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
+                                (int)((unit.WorldX + effect.OffsetPosX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                                (int)((unit.WorldY + effect.OffsetPosY - WorldPosY + Y2) * StaticSize), // Координата Y
                                 (int)(effect.Size * StaticSize),  // Ширина в пикселях
                                 (int)(effect.Size * (effectT.Height / effectT.Width) * StaticSize)   // Высота в пикселях
                                 );
@@ -293,8 +301,8 @@ namespace Factories_And_Guns
                                     Color.White,
                                     effect.Rotation,
                                     new Vector2(
-                                        effectT.Width / 2,
-                                        effectT.Height / 2
+                                        effectT.Width / 2 * effect.OffsetCenterX,
+                                        effectT.Height / 2 * effect.OffsetCenterY
                                         ),
                                     SpriteEffects.None,
                                     0
@@ -333,8 +341,8 @@ namespace Factories_And_Guns
                             Color.White,
                             unit.Rotation,
                             new Vector2(
-                                (float)(shadow.Width / 2 * unit.OffsetX),
-                                (float)(shadow.Height / 2 * unit.OffsetY)
+                                (float)(shadow.Width / 2 * unit.OffsetCenterX),
+                                (float)(shadow.Height / 2 * unit.OffsetCenterY)
                                 ),
                             SpriteEffects.None,
                             0
@@ -368,8 +376,8 @@ namespace Factories_And_Guns
                         Color.White,
                         unit.Rotation,
                         new Vector2(
-                            (float)(body.Width / 2 * unit.OffsetX),
-                            (float)(body.Height / 2 * unit.OffsetY)
+                            (float)(body.Width / 2 * unit.OffsetCenterX),
+                            (float)(body.Height / 2 * unit.OffsetCenterY)
                             ),
                         SpriteEffects.None,
                         0
@@ -383,8 +391,8 @@ namespace Factories_And_Guns
                             Gun gun = unit.Guns[nameGun];
                             Texture2D gunT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/towers"][$"t{n}"];
                             Rectangle destinationRectangleGuns = new( // 4-х угольник, на который будет надета текстура
-                            (int)((unit.WorldX + gun.OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
-                            (int)((unit.WorldY + gun.OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
+                            (int)((unit.WorldX + gun.OffsetPosX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                            (int)((unit.WorldY + gun.OffsetPosY - WorldPosY + Y2) * StaticSize), // Координата Y
                             (int)(gun.Size * StaticSize),  // Ширина в пикселях
                             (int)(gun.Size * (gunT.Height / gunT.Width) * StaticSize)   // Высота в пикселях
                             );
@@ -395,8 +403,8 @@ namespace Factories_And_Guns
                                 Color.White,
                                 gun.Rotation,
                                 new Vector2(
-                                    gunT.Width / 2,
-                                    gunT.Height / 2
+                                    gunT.Width / 2 * gun.OffsetCenterX,
+                                    gunT.Height / 2 * gun.OffsetCenterY
                                     ),
                                 SpriteEffects.None,
                                 0
@@ -413,8 +421,8 @@ namespace Factories_And_Guns
                             MovingParts effect = unit.MovingParts[nameEffect];
                             Texture2D effectT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/parts"][$"p{n}"];
                             Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
-                            (int)((unit.WorldX + effect.OffsetX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
-                            (int)((unit.WorldY + effect.OffsetY - WorldPosY + Y2) * StaticSize), // Координата Y
+                            (int)((unit.WorldX + effect.OffsetPosX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                            (int)((unit.WorldY + effect.OffsetPosY - WorldPosY + Y2) * StaticSize), // Координата Y
                             (int)(effect.Size * StaticSize),  // Ширина в пикселях
                             (int)(effect.Size * (effectT.Height / effectT.Width) * StaticSize)   // Высота в пикселях
                             );
@@ -425,8 +433,8 @@ namespace Factories_And_Guns
                                 Color.White,
                                 effect.Rotation,
                                 new Vector2(
-                                    effectT.Width / 2,
-                                    effectT.Height / 2
+                                    effectT.Width / 2 * effect.OffsetCenterX,
+                                    effectT.Height / 2 * effect.OffsetCenterY
                                     ),
                                 SpriteEffects.None,
                                 0
