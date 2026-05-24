@@ -12,11 +12,20 @@ namespace Factories_And_Guns
         public string Name { get; set; } = Name;
         public string TexturesFolderPath { get; set; } = texturePath;
     }
+    public class InterfaceElement(int x, int y, string name, string path, float size) : Element(name, path)
+    {
+        public int X { get; set; } = x;
+        public int Y { get; set; } = y;
+        public float Size { get; set; } = size;
+        public float Rotation { get; set; } = 0;
+    }
     public class Parameters(float size, float offsetCenterX, float offsetCenterY, float offsetPosX, float offsetPosY, float maxSpeedRotation)
     {
         public float Rotation { get; set; } = 0;
         public float WorldX { get; set; } = 0;
         public float WorldY { get; set; } = 0;
+        public int ScreenX { get; set; } = 0;
+        public int ScreenY { get; set; } = 0;
         public float Size { get; set; } = size;
         public float OffsetCenterX { get; set; } = offsetCenterX;
         public float OffsetCenterY { get; set; } = offsetCenterY;
@@ -264,11 +273,11 @@ namespace Factories_And_Guns
             if (mousePos != Vector2.Zero)
             {
                 // Обработка орудий
-                float atan2 = MathF.Atan2(mousePos.X, -mousePos.Y);
                 if (Guns != null)
                 {
                     foreach (string gun in Guns.Keys)
                     {
+                        mousePos = new(mousePos.X - Guns[gun].ScreenX, mousePos.Y - Guns[gun].ScreenY);
                         Guns[gun].SmoothRotation(mousePos, dt);
                     }
                 }
@@ -286,5 +295,11 @@ namespace Factories_And_Guns
         public Dictionary<string, Element> ElementsIn { get; set; } = elementsIn;
         public Dictionary <string, Element> ElementsOut { get; set; } = elementsOut;
         public Dictionary<string, Element> Elements { get; set; } = null;
+    }
+
+    public class Interface
+    {
+        static public Dictionary<string, Dictionary<string, InterfaceElement>> Templates { get; set; } = [];
+
     }
 }

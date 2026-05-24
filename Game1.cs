@@ -34,6 +34,8 @@ namespace Factories_And_Guns
             MatrixCamera.SpriteBatch = SpriteBatch;
             MatrixCamera.GameWindow = Window;
 
+            Interface.Templates["field"] = [];
+
             base.Initialize();
         }
 

@@ -7,9 +7,7 @@ namespace Factories_And_Guns
     internal class MatrixCamera
     {
         static public float WorldPosX { get; set; } = 0; // Координаты камеры
-        static public float WorldPosY { get; set; } = 0;
-        static public float WorldMousePosX { get; set; } = 0;
-        static public float WorldMousePosY { get; set; } = 0;
+        static public float WorldPosY { get; set; } = 0; 
         static public float SizeX { get; set; } = 60; // Кол-во блоков, которых нужно отрисовать по X
         static public float SizeY { get; set; } = 30; // Кол-во блоков, которых нужно отрисовать по Y
         static public SpriteBatch SpriteBatch { get; set; }
@@ -17,11 +15,6 @@ namespace Factories_And_Guns
         static public Field Field { get; set; }
         static public float StaticSize { get; set; } = 50; // Масштаб
 
-        static public void UpdateMousePos(MouseState state)
-        {
-            WorldMousePosX = state.X / StaticSize + WorldPosX - (SizeX / 2);
-            WorldMousePosY = state.Y / StaticSize + WorldPosY - (SizeY / 2);
-        }
         static public void RenderMatrix()
         {
             StaticSize = GameWindow.ClientBounds.Width / SizeX; // Установка масштаба объектов с учётом кол-ва блоков, которых нужно отрисовать по X ( ширина_окна_в_пикселях / кол-во_блоков.по_X )
@@ -231,12 +224,15 @@ namespace Factories_And_Guns
                     )
                     {
                         Texture2D body = ContentMaster.Textures[unit.TexturesFolderPath]["body"];
+                        int X = (int)((unit.WorldX - WorldPosX + X2) * StaticSize);
+                        int Y = (int)((unit.WorldY - WorldPosY + Y2) * StaticSize);
                         Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
-                            (int)((unit.WorldX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
-                            (int)((unit.WorldY - WorldPosY + Y2) * StaticSize), // Координата Y
+                            X, // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
+                            Y, // Координата Y
                             (int)(unit.Size * StaticSize),  // Ширина в пикселях
                             (int)(unit.Size * (body.Height / body.Width) * StaticSize)   // Высота в пикселях
                         );
+                        unit.ScreenX = X; unit.ScreenY = Y;
                         SpriteBatch.Draw(
                             body,
                             destinationRectangle,
@@ -258,12 +254,15 @@ namespace Factories_And_Guns
                             {
                                 Gun gun = unit.Guns[nameGun];
                                 Texture2D gunT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/towers"][$"t{n}"];
+                                int gX = (int)((unit.WorldX + gun.OffsetPosX - WorldPosX + X2) * StaticSize);
+                                int gY = (int)((unit.WorldY + gun.OffsetPosY - WorldPosY + Y2) * StaticSize);
                                 Rectangle destinationRectangleGuns = new( // 4-х угольник, на который будет надета текстура
-                                (int)((unit.WorldX + gun.OffsetPosX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
-                                (int)((unit.WorldY + gun.OffsetPosY - WorldPosY + Y2) * StaticSize), // Координата Y
+                                gX, // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                                gY, // Координата Y
                                 (int)(gun.Size * StaticSize),  // Ширина в пикселях
                                 (int)(gun.Size * (gunT.Height / gunT.Width) * StaticSize)   // Высота в пикселях
                                 );
+                                gun.ScreenX = gX; gun.ScreenY = gY;
                                 SpriteBatch.Draw(
                                     gunT,
                                     destinationRectangleGuns,
@@ -288,12 +287,15 @@ namespace Factories_And_Guns
                             {
                                 MovingParts effect = unit.MovingParts[nameEffect];
                                 Texture2D effectT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/parts"][$"p{n}"];
+                                int eX = (int)((unit.WorldX + effect.OffsetPosX - WorldPosX + X2) * StaticSize);
+                                int eY = (int)((unit.WorldY + effect.OffsetPosY - WorldPosY + Y2) * StaticSize);
                                 Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
-                                (int)((unit.WorldX + effect.OffsetPosX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
-                                (int)((unit.WorldY + effect.OffsetPosY - WorldPosY + Y2) * StaticSize), // Координата Y
+                                eX, // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                                eY, // Координата Y
                                 (int)(effect.Size * StaticSize),  // Ширина в пикселях
                                 (int)(effect.Size * (effectT.Height / effectT.Width) * StaticSize)   // Высота в пикселях
                                 );
+                                effect.ScreenX = eX; effect.ScreenY = eY;
                                 SpriteBatch.Draw(
                                     effectT,
                                     destinationRectangleEffects,
@@ -363,12 +365,15 @@ namespace Factories_And_Guns
                 )
                 {
                     Texture2D body = ContentMaster.Textures[unit.TexturesFolderPath]["body"];
+                    int X = (int)((unit.WorldX - WorldPosX + X2) * StaticSize);
+                    int Y = (int)((unit.WorldY - WorldPosY + Y2) * StaticSize);
                     Rectangle destinationRectangle = new( // 4-х угольник, на который будет надета текстура
-                        (int)((unit.WorldX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
-                        (int)((unit.WorldY - WorldPosY + Y2) * StaticSize), // Координата Y
+                        X, // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта) )
+                        Y, // Координата Y
                         (int)(unit.Size * StaticSize),  // Ширина в пикселях
                         (int)(unit.Size * (body.Height / body.Width) * StaticSize)   // Высота в пикселях
                     );
+                    unit.ScreenX = X; unit.ScreenY = Y;
                     SpriteBatch.Draw(
                         body,
                         destinationRectangle,
@@ -390,12 +395,15 @@ namespace Factories_And_Guns
                         {
                             Gun gun = unit.Guns[nameGun];
                             Texture2D gunT = ContentMaster.Textures[$"{unit.TexturesFolderPath}/towers"][$"t{n}"];
+                            int gX = (int)((unit.WorldX + gun.OffsetPosX - WorldPosX + X2) * StaticSize);
+                            int gY = (int)((unit.WorldY + gun.OffsetPosY - WorldPosY + Y2) * StaticSize);
                             Rectangle destinationRectangleGuns = new( // 4-х угольник, на который будет надета текстура
-                            (int)((unit.WorldX + gun.OffsetPosX - WorldPosX + X2) * StaticSize), // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
-                            (int)((unit.WorldY + gun.OffsetPosY - WorldPosY + Y2) * StaticSize), // Координата Y
+                            gX, // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                            gY, // Координата Y
                             (int)(gun.Size * StaticSize),  // Ширина в пикселях
                             (int)(gun.Size * (gunT.Height / gunT.Width) * StaticSize)   // Высота в пикселях
                             );
+                            unit.ScreenX = gX; unit.ScreenY = gY;
                             SpriteBatch.Draw(
                                 gunT,
                                 destinationRectangleGuns,
@@ -443,6 +451,29 @@ namespace Factories_And_Guns
                         }
                     }
                 }
+            }
+
+            var ind = Interface.Templates["field"].Keys;
+            foreach (string name in ind)
+            {
+                var element = Interface.Templates["field"][name];
+                Texture2D elementT = ContentMaster.Textures[element.TexturesFolderPath][element.Name];
+                Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
+                element.X, // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                element.Y, // Координата Y
+                (int)element.Size,  // Ширина в пикселях
+                (int)(element.Size * (elementT.Height / elementT.Width))   // Высота в пикселях
+                );
+                SpriteBatch.Draw(
+                    elementT,
+                    destinationRectangleEffects,
+                    null,
+                    Color.White,
+                    element.Rotation,
+                    new(elementT.Height / 2, elementT.Width / 2),
+                    SpriteEffects.None,
+                    0
+                );
             }
         }
     }

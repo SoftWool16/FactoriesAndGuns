@@ -17,6 +17,7 @@ namespace Factories_And_Guns
         public int SizeX { get; set; } = 0;
         public int SizeY { get; set; } = 0;
         public Equipment CurrentEquipment { get; set; } = null;
+        public int MouseWheelValue { get; set; } = 0;
 
         //public enum TypeEffectsOnField
         //{
@@ -33,7 +34,7 @@ namespace Factories_And_Guns
         //    SizeX = sizeX;
         //    SizeY = sizeY;
         //}
-        public Field (string name, int sizeX, int sizeY)
+        public Field(string name, int sizeX, int sizeY)
         {
             Name = name;
             FieldBackground = new Element[sizeY, sizeX];
@@ -84,17 +85,21 @@ namespace Factories_And_Guns
             FieldEquipment["air"]["dragonfly1"] = new Equipment(1, 0.6f, 0, 0, 4.6f, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 25, 40, 5, 300, EquipmentMoveType.hovering);
 
             CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
+
+            Interface.Templates["field"]["scope"] = new(0, 0, "base", "User_Interface/scopes", 30);
         }
         public void Update(GameTime gameTime)
         {
             var key = Keyboard.GetState();
 
             var mouseState = Mouse.GetState();
-            MatrixCamera.UpdateMousePos(mouseState);
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             CurrentEquipment?.InputHalderEquipment(key, mouseState, dt);
+
+            Interface.Templates["field"]["scope"].X = mouseState.X;
+            Interface.Templates["field"]["scope"].Y = mouseState.Y;
 
             if (key.IsKeyDown(Keys.D1))
             {
@@ -106,16 +111,17 @@ namespace Factories_And_Guns
                 if (CurrentEquipment != FieldEquipment["ground"]["beta1"]) CurrentEquipment = FieldEquipment["ground"]["beta1"];
             }
 
-            if (key.IsKeyDown(Keys.Up) && MatrixCamera.SizeY < 150)
+            if (mouseState.ScrollWheelValue < MouseWheelValue && MatrixCamera.SizeY < 150)
             {
-                MatrixCamera.SizeY *= 1.05f;
-                MatrixCamera.SizeX *= 1.05f;
+                MatrixCamera.SizeY *= 1.1f;
+                MatrixCamera.SizeX *= 1.1f;
             }
-            else if (key.IsKeyDown(Keys.Down) && MatrixCamera.SizeY > 30)
+            else if (mouseState.ScrollWheelValue > MouseWheelValue && MatrixCamera.SizeY > 30)
             {
-                MatrixCamera.SizeY /= 1.05f;
-                MatrixCamera.SizeX /= 1.05f;
+                MatrixCamera.SizeY /= 1.1f;
+                MatrixCamera.SizeX /= 1.1f;
             }
+            MouseWheelValue = mouseState.ScrollWheelValue;
 
             var unitTypeList = FieldEquipment.Keys;
             foreach (string type in unitTypeList)
@@ -160,8 +166,8 @@ namespace Factories_And_Guns
                     {
                         mousePos = new
                         (
-                            MatrixCamera.WorldMousePosX,
-                            MatrixCamera.WorldMousePosY
+                            mouseState.X,
+                            mouseState.Y
                         );
                     }
 
