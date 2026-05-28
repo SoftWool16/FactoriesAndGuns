@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Xml.Linq;
 
 namespace Factories_And_Guns
 {
@@ -12,11 +14,26 @@ namespace Factories_And_Guns
         public string Name { get; set; } = Name;
         public string TexturesFolderPath { get; set; } = texturePath;
     }
-    public class InterfaceElement(int x, int y, string name, string path, float size) : Element(name, path)
+    public class InterfaceElement : Element
     {
-        public int X { get; set; } = x;
-        public int Y { get; set; } = y;
-        public float Size { get; set; } = size;
+        public InterfaceElement(int x, int y, string name, string path, float size) : base(name, path)
+        {
+            X = x;
+            Y = y;
+            SizeX = size;
+            SizeY = size;
+        }
+        public InterfaceElement(int x, int y, string name, string path, float sizeX, float sizeY) : base(name, path)
+        {
+            X = x;
+            Y = y;
+            SizeX = sizeX;
+            SizeY = sizeY;
+        }
+        public int X { get; set; } = 0;
+        public int Y { get; set; } = 0;
+        public float SizeX { get; set; } = 1;
+        public float SizeY { get; set; } = 1;
         public float Rotation { get; set; } = 0;
     }
     public class Parameters(float size, float offsetCenterX, float offsetCenterY, float offsetPosX, float offsetPosY, float maxSpeedRotation)

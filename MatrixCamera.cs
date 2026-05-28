@@ -14,7 +14,23 @@ namespace Factories_And_Guns
         static public GameWindow GameWindow { get; set; }
         static public Field Field { get; set; }
         static public float StaticSize { get; set; } = 50; // Масштаб
+        static public float SizeVector { get; set; } = 1;
+        static public float CameraSpeed { get; set; } = 0.01f;
+        static public float CameraSpeedZoom { get; set; } = 0.01f;
+        static public float MinZoom { get; set; } = 60;
+        static public float MaxZoom { get; set; } = 350;
 
+        static public void CameraUpdate()
+        {
+            if (SizeX * SizeVector < MaxZoom &&
+                SizeX * SizeVector > MinZoom
+                ) SizeX *= SizeVector;
+            else SizeVector = 1;
+
+            if (SizeVector > 1 + CameraSpeedZoom) SizeVector -= CameraSpeedZoom;
+            else if (SizeVector < 1 - CameraSpeedZoom) SizeVector += CameraSpeedZoom;
+            else SizeVector = 1;
+        }
         static public void RenderMatrix()
         {
             StaticSize = GameWindow.ClientBounds.Width / SizeX; // Установка масштаба объектов с учётом кол-ва блоков, которых нужно отрисовать по X ( ширина_окна_в_пикселях / кол-во_блоков.по_X )
@@ -459,10 +475,33 @@ namespace Factories_And_Guns
                 var element = Interface.Templates["field"][name];
                 Texture2D elementT = ContentMaster.Textures[element.TexturesFolderPath][element.Name];
                 Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
-                element.X, // Координата X ( (int)((координатаОбъекта.поX - координатаКамеры.поX + половина.масштабаX) * размер.объекта * отклонение.поX) )
+                element.X, // Координата X
                 element.Y, // Координата Y
-                (int)element.Size,  // Ширина в пикселях
-                (int)(element.Size * (elementT.Height / elementT.Width))   // Высота в пикселях
+                (int)element.SizeX,  // Ширина в пикселях
+                (int)(element.SizeY * (elementT.Height / elementT.Width))   // Высота в пикселях
+                );
+                SpriteBatch.Draw(
+                    elementT,
+                    destinationRectangleEffects,
+                    null,
+                    Color.White,
+                    element.Rotation,
+                    new(elementT.Height / 2, elementT.Width / 2),
+                    SpriteEffects.None,
+                    0
+                );
+            }
+
+            var top = Interface.Templates["surface"].Keys;
+            foreach (string name in top)
+            {
+                var element = Interface.Templates["surface"][name];
+                Texture2D elementT = ContentMaster.Textures[element.TexturesFolderPath][element.Name];
+                Rectangle destinationRectangleEffects = new( // 4-х угольник, на который будет надета текстура
+                element.X, // Координата X
+                element.Y, // Координата Y
+                (int)element.SizeX,  // Ширина в пикселях
+                (int)(element.SizeY * (elementT.Height / elementT.Width))   // Высота в пикселях
                 );
                 SpriteBatch.Draw(
                     elementT,

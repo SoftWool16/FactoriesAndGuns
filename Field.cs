@@ -18,6 +18,7 @@ namespace Factories_And_Guns
         public int SizeY { get; set; } = 0;
         public Equipment CurrentEquipment { get; set; } = null;
         public int MouseWheelValue { get; set; } = 0;
+        public bool Pause { get; set; } = false;
 
         //public enum TypeEffectsOnField
         //{
@@ -67,6 +68,9 @@ namespace Factories_And_Guns
             FieldEquipment["ground"] = [];
             FieldEquipment["air"] = [];
 
+            Interface.Templates["field"] = [];
+            Interface.Templates["surface"] = [];
+
             MovingParts effects1 = new(0, 0, 0, 0, 2, MovingPartsType.rotation, 2);
             Dictionary<string, Element> elementsOut = [];
             elementsOut["metal"] = new("metal1", "metal");
@@ -87,6 +91,8 @@ namespace Factories_And_Guns
             CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
 
             Interface.Templates["field"]["scope"] = new(0, 0, "base", "User_Interface/scopes", 30);
+            Interface.Templates["surface"]["top"] = new(0, 0, "background", "User_Interface", 500, 100);
+
         }
         public void Update(GameTime gameTime)
         {
@@ -95,8 +101,6 @@ namespace Factories_And_Guns
             var mouseState = Mouse.GetState();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            CurrentEquipment?.InputHalderEquipment(key, mouseState, dt);
 
             Interface.Templates["field"]["scope"].X = mouseState.X;
             Interface.Templates["field"]["scope"].Y = mouseState.Y;
@@ -111,80 +115,98 @@ namespace Factories_And_Guns
                 if (CurrentEquipment != FieldEquipment["ground"]["beta1"]) CurrentEquipment = FieldEquipment["ground"]["beta1"];
             }
 
-            if (mouseState.ScrollWheelValue < MouseWheelValue && MatrixCamera.SizeY < 150)
+            if (mouseState.ScrollWheelValue < MouseWheelValue && MatrixCamera.SizeX < 350)
             {
-                MatrixCamera.SizeY *= 1.1f;
-                MatrixCamera.SizeX *= 1.1f;
+                MatrixCamera.SizeVector = 1.05f;
             }
-            else if (mouseState.ScrollWheelValue > MouseWheelValue && MatrixCamera.SizeY > 30)
+            else if (mouseState.ScrollWheelValue > MouseWheelValue && MatrixCamera.SizeX > 60)
             {
-                MatrixCamera.SizeY /= 1.1f;
-                MatrixCamera.SizeX /= 1.1f;
+                MatrixCamera.SizeVector = 0.95f;
             }
+
+            MatrixCamera.CameraUpdate();
+
             MouseWheelValue = mouseState.ScrollWheelValue;
 
-            var unitTypeList = FieldEquipment.Keys;
-            foreach (string type in unitTypeList)
+            if (key.IsKeyDown(Keys.P)) Pause = !Pause;
+
+            if (Pause == false)
             {
-                var unitList = FieldEquipment[type].Keys;
-                foreach (string name in unitList)
+                CurrentEquipment?.InputHalderEquipment(key, mouseState, dt);
+
+                var unitTypeList = FieldEquipment.Keys;
+                foreach (string type in unitTypeList)
                 {
-                    bool x = true;
-                    bool y = true;
-                    var unit = FieldEquipment[type][name];
-                    if (unit.Type == "ground") // ≈сли единица наземна€ - обработка столкновений
+                    var unitList = FieldEquipment[type].Keys;
+                    foreach (string name in unitList)
                     {
-                        float vX = unit.Velocity.X;
-                        float vY = unit.Velocity.Y;
-
-                        float unitSizeX = unit.Size / 2;
-                        float unitSizeY = unit.Size / 2;
-
-                        if (vX < 0) unitSizeX = -unitSizeX;
-                        if (vY < 0) unitSizeY = -unitSizeY;
-
-                        float uX = unit.WorldX + vX * dt + unitSizeX;
-                        float uY = unit.WorldY + vY * dt + unitSizeY;
-
-                        if (uX > 0 && uX < SizeX)
+                        bool x = true;
+                        bool y = true;
+                        var unit = FieldEquipment[type][name];
+                        if (unit.Type == "ground") // ≈сли единица наземна€ - обработка столкновений
                         {
-                            if (FieldBuild[(int)uX,
-                                (int)unit.WorldY] != null) x = false;
-                        } else { x = false; }
+                            float vX = unit.Velocity.X;
+                            float vY = unit.Velocity.Y;
 
-                        if (uY > 0 && uY < SizeY)
+                            float unitSizeX = unit.Size / 2;
+                            float unitSizeY = unit.Size / 2;
+
+                            if (vX < 0) unitSizeX = -unitSizeX;
+                            if (vY < 0) unitSizeY = -unitSizeY;
+
+                            float uX = unit.WorldX + vX * dt + unitSizeX;
+                            float uY = unit.WorldY + vY * dt + unitSizeY;
+
+                            if (uX > 0 && uX < SizeX)
+                            {
+                                if (FieldBuild[(int)uX,
+                                    (int)unit.WorldY] != null) x = false;
+                            }
+                            else { x = false; }
+
+                            if (uY > 0 && uY < SizeY)
+                            {
+                                if (FieldBuild[(int)unit.WorldX,
+                                    (int)uY] != null) y = false;
+                            }
+                            else { y = false; }
+                        }
+                        if (CurrentEquipment != unit) unit.SmoothStop(dt);
+
+                        Vector2 mousePos = Vector2.Zero;
+
+                        if (CurrentEquipment == unit)
                         {
-                            if (FieldBuild[(int)unit.WorldX,
-                                (int)uY] != null) y = false;
-                        } else {  y = false; }
+                            mousePos = new
+                            (
+                                mouseState.X,
+                                mouseState.Y
+                            );
+                        }
+
+                        unit.Update(dt, x, y, mousePos);
                     }
-                    if (CurrentEquipment != unit) unit.SmoothStop(dt);
+                }
 
-                    Vector2 mousePos = Vector2.Zero;
-
-                    if (CurrentEquipment == unit)
+                BaseFactory[,] buildList = FieldBuild;
+                if (buildList != null)
+                {
+                    for (int i = 0; i < SizeY; i++)
                     {
-                        mousePos = new
-                        (
-                            mouseState.X,
-                            mouseState.Y
-                        );
+                        for (int j = 0; j < SizeX; j++)
+                        {
+                            buildList[i, j]?.MovingParts?.MovingPartsUpdate(dt);
+                        }
                     }
-
-                    unit.Update(dt, x, y, mousePos);
                 }
             }
-
-            BaseFactory[,] buildList = FieldBuild;
-            if (buildList != null)
+            else
             {
-                for (int i = 0; i < SizeY; i++)
-                {
-                    for (int j = 0; j < SizeX; j++)
-                    {
-                        buildList[i, j]?.MovingParts?.MovingPartsUpdate(dt);
-                    }
-                }
+                float speed = MatrixCamera.CameraSpeed * MatrixCamera.SizeY;
+                if (key.IsKeyDown(Keys.W)) MatrixCamera.WorldPosY -= speed;
+                if (key.IsKeyDown(Keys.S)) MatrixCamera.WorldPosY += speed;
+                if (key.IsKeyDown(Keys.D)) MatrixCamera.WorldPosX += speed;
+                if (key.IsKeyDown(Keys.A)) MatrixCamera.WorldPosX -= speed;
             }
         }
         //public void AddEffect(float x,  float y, float time, float size, TypeEffectsOnField type)
