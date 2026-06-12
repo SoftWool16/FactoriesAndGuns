@@ -197,14 +197,17 @@ namespace Factories_And_Guns
 
         public float Height { get; set; } = 3; // Высота полёта ( для воздушных )
 
-        public void InputHalderEquipment(KeyboardState key, MouseState mouse, float dt)
+        public void InputHalderEquipment(Keys[] keys, MouseState mouse, float dt)
         {
             // Направляющий вектор ( (0,0) если нет ввода )
             Vector2 move = Vector2.Zero;
-            if (key.IsKeyDown(Keys.W)) move.Y -= 1;
-            if (key.IsKeyDown(Keys.S)) move.Y += 1;
-            if (key.IsKeyDown(Keys.A)) move.X -= 1;
-            if (key.IsKeyDown(Keys.D)) move.X += 1;
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (keys[i] == Keys.W) move.Y -= 1;
+                if (keys[i] == Keys.S) move.Y += 1;
+                if (keys[i] == Keys.A) move.X -= 1;
+                if (keys[i] == Keys.D) move.X += 1;
+            }
 
             if (move != Vector2.Zero)
             {
@@ -317,6 +320,7 @@ namespace Factories_And_Guns
     public class Interface
     {
         static public Dictionary<string, Dictionary<string, InterfaceElement>> Templates { get; set; } = [];
-
+        static public string CurrentTemplate { get; set; } = null;
+        static public InterfaceElement Cursor { get; set; } = new(0, 0, "base", "User_Interface/cursors", 30);
     }
 }

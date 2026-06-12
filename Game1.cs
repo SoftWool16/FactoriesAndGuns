@@ -20,7 +20,7 @@ namespace Factories_And_Guns
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
 
             Window.AllowUserResizing = true;  // Разрешаем пользователю менять размер окна вручную
         }
@@ -33,6 +33,13 @@ namespace Factories_And_Guns
 
             MatrixCamera.SpriteBatch = SpriteBatch;
             MatrixCamera.GameWindow = Window;
+
+            Interface.Templates["field"] = [];
+            Interface.Templates["surface"] = [];
+            Interface.Templates["map"] = [];
+            Interface.Templates["learning"] = [];
+
+            Interface.Templates["learning"]["background"] = new(0, 0, "background", "User_Interface", Window.ClientBounds.Width, Window.ClientBounds.Height);
 
             base.Initialize();
         }
@@ -63,8 +70,9 @@ namespace Factories_And_Guns
                 Exit();
 
             // НАЗНАЧЕНИЕ: Внутренняя логика.
+            Keys[] keys = Keyboard.GetState().GetPressedKeys();
 
-            Field.Update(gameTime);
+            Field.Update(gameTime, keys);
 
             base.Update(gameTime);
         }

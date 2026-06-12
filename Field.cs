@@ -68,8 +68,37 @@ namespace Factories_And_Guns
             FieldEquipment["ground"] = [];
             FieldEquipment["air"] = [];
 
-            Interface.Templates["field"] = [];
-            Interface.Templates["surface"] = [];
+            Interface.CurrentTemplate = "surface";
+
+            LearningSystem.System = new Object[20, 20];
+
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; j < 20; j++)
+                {
+                    LearningSystem.System[i, j] = null;
+                }
+            }
+
+            LearningSystem.System[10, 10] = new(null, null, null, TypeLearning.opened);
+            LearningSystem.System[9, 10] = new(null, null, null, TypeLearning.closed);
+            LearningSystem.System[8, 10] = new(null, null, null, TypeLearning.locked);
+
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0;j < 20; j++)
+                {
+                    if (LearningSystem.System[i, j] != null)
+                    {
+                        string nameL = "";
+                        var type = LearningSystem.System[i, j].TypeLearning;
+                        if (type == TypeLearning.opened) nameL = "opened";
+                        else if (type == TypeLearning.closed) nameL = "closed";
+                        else if (type == TypeLearning.locked) nameL = "closed";
+                        Interface.Templates["learning"][$"l{i + j}"] = new(70 * i, 70 * j, nameL, $"User_Interface/frame", 50);
+                    }
+                }
+            }
 
             MovingParts effects1 = new(0, 0, 0, 0, 2, MovingPartsType.rotation, 2);
             Dictionary<string, Element> elementsOut = [];
@@ -86,33 +115,39 @@ namespace Factories_And_Guns
 
             Dictionary<string, MovingParts> effects = []; // Создание списка с подвижными частями
             effects["effect1"] = new MovingParts(1, 1, 0, 0, 15, MovingPartsType.rotation, 4.6f);
-            FieldEquipment["air"]["dragonfly1"] = new Equipment(1, 0.6f, 0, 0, 4.6f, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 25, 40, 5, 300, EquipmentMoveType.hovering);
+            FieldEquipment["air"]["dragonfly1"] = new Equipment(1, 0.6f, 0, 0, 2f, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 25, 40, 5, 300, EquipmentMoveType.hovering);
 
             CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
 
-            Interface.Templates["field"]["scope"] = new(0, 0, "base", "User_Interface/scopes", 30);
-            Interface.Templates["surface"]["top"] = new(0, 0, "background", "User_Interface", 500, 100);
+            //Interface.Templates["field"]["scope"] = new(0, 0, "base", "User_Interface/scopes", 30);
+            //Interface.Templates["surface"]["top"] = new(0, 0, "background", "User_Interface", 500, 100);
 
         }
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, Keys[] keys)
         {
-            var key = Keyboard.GetState();
-
             var mouseState = Mouse.GetState();
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            Interface.Templates["field"]["scope"].X = mouseState.X;
-            Interface.Templates["field"]["scope"].Y = mouseState.Y;
+            Interface.Cursor.X = mouseState.X;
+            Interface.Cursor.Y = mouseState.Y;
 
-            if (key.IsKeyDown(Keys.D1))
+            for (int i = 0; i < keys.Length; i++)
             {
-                if (CurrentEquipment != FieldEquipment["air"]["dragonfly1"]) CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
-            }
+                if (keys[i] == Keys.D1)
+                {
+                    if (CurrentEquipment != FieldEquipment["air"]["dragonfly1"]) CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
+                }
 
-            else if (key.IsKeyDown(Keys.D2))
-            {
-                if (CurrentEquipment != FieldEquipment["ground"]["beta1"]) CurrentEquipment = FieldEquipment["ground"]["beta1"];
+                else if (keys[i] == Keys.D2)
+                {
+                    if (CurrentEquipment != FieldEquipment["ground"]["beta1"]) CurrentEquipment = FieldEquipment["ground"]["beta1"];
+                }
+
+                if (keys[i] == Keys.P) Pause = !Pause;
+
+                if (keys[i] == Keys.I && Interface.CurrentTemplate != "learning") Interface.CurrentTemplate = "learning";
+                else Interface.CurrentTemplate = "surface";
             }
 
             if (mouseState.ScrollWheelValue < MouseWheelValue && MatrixCamera.SizeX < 350)
@@ -128,11 +163,9 @@ namespace Factories_And_Guns
 
             MouseWheelValue = mouseState.ScrollWheelValue;
 
-            if (key.IsKeyDown(Keys.P)) Pause = !Pause;
-
             if (Pause == false)
             {
-                CurrentEquipment?.InputHalderEquipment(key, mouseState, dt);
+                CurrentEquipment?.InputHalderEquipment(keys, mouseState, dt);
 
                 var unitTypeList = FieldEquipment.Keys;
                 foreach (string type in unitTypeList)
@@ -203,10 +236,13 @@ namespace Factories_And_Guns
             else
             {
                 float speed = MatrixCamera.CameraSpeed * MatrixCamera.SizeY;
-                if (key.IsKeyDown(Keys.W)) MatrixCamera.WorldPosY -= speed;
-                if (key.IsKeyDown(Keys.S)) MatrixCamera.WorldPosY += speed;
-                if (key.IsKeyDown(Keys.D)) MatrixCamera.WorldPosX += speed;
-                if (key.IsKeyDown(Keys.A)) MatrixCamera.WorldPosX -= speed;
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    if (keys[i] == Keys.W) MatrixCamera.WorldPosY -= speed;
+                    if (keys[i] == Keys.S) MatrixCamera.WorldPosY += speed;
+                    if (keys[i] == Keys.D) MatrixCamera.WorldPosX += speed;
+                    if (keys[i] == Keys.A) MatrixCamera.WorldPosX -= speed;
+                }
             }
         }
         //public void AddEffect(float x,  float y, float time, float size, TypeEffectsOnField type)
