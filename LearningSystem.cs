@@ -17,7 +17,7 @@ namespace Factories_And_Guns
         public Object LastObject { get; set; } = lastObject;
         public TypeLearning TypeLearning { get; set; } = typeLearning;
     }
-    internal class LearningSystem
+    class LearningSystem
     {
         static public string BackgroundPath { get; set; } = "User_Interface/background";
         static public Object[,] System = null;

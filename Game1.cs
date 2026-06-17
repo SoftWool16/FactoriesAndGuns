@@ -6,13 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 
 namespace Factories_And_Guns
 {
     public class Game1 : Game
     {
-        private Field Field;
-
         private GraphicsDeviceManager _graphics;
         private SpriteBatch SpriteBatch;
 
@@ -31,15 +30,18 @@ namespace Factories_And_Guns
             SpriteBatch = new SpriteBatch(GraphicsDevice);
             OpenSource.GraphicsDevice = GraphicsDevice;
 
-            MatrixCamera.SpriteBatch = SpriteBatch;
-            MatrixCamera.GameWindow = Window;
-
             Interface.Templates["field"] = [];
             Interface.Templates["surface"] = [];
             Interface.Templates["map"] = [];
             Interface.Templates["learning"] = [];
+            Interface.Templates["settings"] = [];
 
-            Interface.Templates["learning"]["background"] = new(0, 0, "background", "User_Interface", Window.ClientBounds.Width, Window.ClientBounds.Height);
+            Interface.Templates["learning"]["background"] = new(0, 0, "background", "User_Interface", 1, true, false);
+
+            Interface.Keys["learning"] = Keys.I;
+            Interface.Keys["back"] = Keys.Back;
+            Interface.Keys["home"] = Keys.Escape;
+            //Interface.Keys["the main mouse button"] = 
 
             base.Initialize();
         }
@@ -60,19 +62,30 @@ namespace Factories_And_Guns
 
             ContentMaster.LoadTexture(Content); // Загружаем текстуры.
 
-            Field = new("New field", 100, 100); // Создаём поле после того, как загрузим текстуры.
-            MatrixCamera.Field = Field;
+            General.SunSystems["A New Beginning"] = new("A New Beginning");
+            General.SunSystems["A New Beginning"].Planets["New planet"] = new(0, null, 100);
+            General.SunSystems["A New Beginning"].Planets["New planet"].Fields["New field"] = new("", 100, 100, Difficulty.Medium);
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (Keyboard.GetState().IsKeyDown(Keys.Delete))
                 Exit();
 
             // НАЗНАЧЕНИЕ: Внутренняя логика.
+
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             Keys[] keys = Keyboard.GetState().GetPressedKeys();
 
-            Field.Update(gameTime, keys);
+            var mouse = Mouse.GetState();
+
+            Interface.Cursor.X = mouse.X;
+            Interface.Cursor.Y = mouse.Y;
+
+            Interface.Update(keys, mouse);
+
+            General.Update(dt, keys, mouse);
 
             base.Update(gameTime);
         }
@@ -85,7 +98,7 @@ namespace Factories_And_Guns
 
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp); // PointClamp - без сглаживания текстур (по-пиксельная отрисовка).
 
-            MatrixCamera.RenderMatrix();
+            MatrixCamera.RenderMatrix(Window, SpriteBatch);
 
             SpriteBatch.End();
 

@@ -37,6 +37,18 @@
 /processorParam:TextureFormat=Color
 /build:../../Desktop/модельки для MyMindustry/dragonfly (air)/patrial_shade.png;Air_Equipment/Dragonfly/partial_shade.png
 
+#begin ../../Desktop/модельки для MyMindustry/dragonfly (air)/propeller.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../Desktop/модельки для MyMindustry/dragonfly (air)/propeller.png;Air_Equipment/Dragonfly/parts/p0.png
+
 #begin ../../Desktop/модельки для MyMindustry/dragonfly (air)/shadow.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -108,18 +120,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:../../Desktop/модельки для MyMindustry/блоки/water.png;Block/water.png
-
-#begin Air_Equipment/Dragonfly/parts/propeller.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Air_Equipment/Dragonfly/parts/propeller.png;Air_Equipment/Dragonfly/parts/p0.png
 
 #begin Build/conveyors/body.png
 /importer:TextureImporter

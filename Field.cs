@@ -6,9 +6,15 @@ using System.Collections.Generic;
 
 namespace Factories_And_Guns
 {
-    internal class Field
+    public enum Difficulty
+    {
+        Casual, Easy, Medium, Difficult, VeryDifficult, Hellish
+    }
+    class Field
     {
         public string Name { get; set; } = "New Field";
+
+        public Difficulty Difficulty { get; set; } = Difficulty.Medium;
 
         public Element[,] FieldBackground = null;                              // Фон
         public BaseFactory[,] FieldBuild = null;                               // Постройки
@@ -35,9 +41,12 @@ namespace Factories_And_Guns
         //    SizeX = sizeX;
         //    SizeY = sizeY;
         //}
-        public Field(string name, int sizeX, int sizeY)
+        public Field(string name, int sizeX, int sizeY, Difficulty difficulty)
         {
             Name = name;
+
+            Difficulty = difficulty;
+
             FieldBackground = new Element[sizeY, sizeX];
             FieldBuild = new BaseFactory[sizeY, sizeX];
             SizeX = sizeX;
@@ -68,7 +77,7 @@ namespace Factories_And_Guns
             FieldEquipment["ground"] = [];
             FieldEquipment["air"] = [];
 
-            Interface.CurrentTemplate = "surface";
+            Interface.CurrentTemplate[0] = "surface";
 
             LearningSystem.System = new Object[20, 20];
 
@@ -95,7 +104,7 @@ namespace Factories_And_Guns
                         if (type == TypeLearning.opened) nameL = "opened";
                         else if (type == TypeLearning.closed) nameL = "closed";
                         else if (type == TypeLearning.locked) nameL = "closed";
-                        Interface.Templates["learning"][$"l{i + j}"] = new(70 * i, 70 * j, nameL, $"User_Interface/frame", 50);
+                        Interface.Templates["learning"][$"l{i + j}"] = new(70 * i, 70 * j, nameL, $"User_Interface/frame", 50, false, false);
                     }
                 }
             }
@@ -114,24 +123,16 @@ namespace Factories_And_Guns
             FieldEquipment["ground"]["beta1"] = new Equipment(1, 1, 0, 0, 1.8f, "Beta", 1.5f, 1.5f, "Ground_Equipment/Beta", tower, null, 20, 20, 50, 6, 1000, EquipmentMoveType.tracked, 0, 1);
 
             Dictionary<string, MovingParts> effects = []; // Создание списка с подвижными частями
-            effects["effect1"] = new MovingParts(1, 1, 0, 0, 15, MovingPartsType.rotation, 4.6f);
+            effects["effect1"] = new MovingParts(1, 1, 0, 0, 15, MovingPartsType.rotation, 6);
             FieldEquipment["air"]["dragonfly1"] = new Equipment(1, 0.6f, 0, 0, 2f, "Dragonfly", 5.5f, 5.5f, "Air_Equipment/Dragonfly", null, effects, 25, 40, 5, 300, EquipmentMoveType.hovering);
 
             CurrentEquipment = FieldEquipment["air"]["dragonfly1"];
 
             //Interface.Templates["field"]["scope"] = new(0, 0, "base", "User_Interface/scopes", 30);
             //Interface.Templates["surface"]["top"] = new(0, 0, "background", "User_Interface", 500, 100);
-
         }
-        public void Update(GameTime gameTime, Keys[] keys)
+        public void Update(float dt, Keys[] keys, MouseState mouse)
         {
-            var mouseState = Mouse.GetState();
-
-            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            Interface.Cursor.X = mouseState.X;
-            Interface.Cursor.Y = mouseState.Y;
-
             for (int i = 0; i < keys.Length; i++)
             {
                 if (keys[i] == Keys.D1)
@@ -145,27 +146,23 @@ namespace Factories_And_Guns
                 }
 
                 if (keys[i] == Keys.P) Pause = !Pause;
-
-                if (keys[i] == Keys.I && Interface.CurrentTemplate != "learning") Interface.CurrentTemplate = "learning";
-                else Interface.CurrentTemplate = "surface";
             }
 
-            if (mouseState.ScrollWheelValue < MouseWheelValue && MatrixCamera.SizeX < 350)
+            if (mouse.ScrollWheelValue < MouseWheelValue && MatrixCamera.SizeX < 350)
             {
                 MatrixCamera.SizeVector = 1.05f;
             }
-            else if (mouseState.ScrollWheelValue > MouseWheelValue && MatrixCamera.SizeX > 60)
+            else if (mouse.ScrollWheelValue > MouseWheelValue && MatrixCamera.SizeX > 60)
             {
                 MatrixCamera.SizeVector = 0.95f;
             }
+            MouseWheelValue = mouse.ScrollWheelValue;
 
             MatrixCamera.CameraUpdate();
 
-            MouseWheelValue = mouseState.ScrollWheelValue;
-
             if (Pause == false)
             {
-                CurrentEquipment?.InputHalderEquipment(keys, mouseState, dt);
+                CurrentEquipment?.InputHalderEquipment(keys, mouse, dt);
 
                 var unitTypeList = FieldEquipment.Keys;
                 foreach (string type in unitTypeList)
@@ -212,8 +209,8 @@ namespace Factories_And_Guns
                         {
                             mousePos = new
                             (
-                                mouseState.X,
-                                mouseState.Y
+                                mouse.X,
+                                mouse.Y
                             );
                         }
 

@@ -3,9 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Xml.Linq;
 
 namespace Factories_And_Guns
 {
@@ -14,27 +11,35 @@ namespace Factories_And_Guns
         public string Name { get; set; } = Name;
         public string TexturesFolderPath { get; set; } = texturePath;
     }
-    public class InterfaceElement : Element
+    public class InterfaceElement(int x, int y, string name, string path, int size, bool foolScreen, bool isAButton) : Element(name, path)
     {
-        public InterfaceElement(int x, int y, string name, string path, float size) : base(name, path)
-        {
-            X = x;
-            Y = y;
-            SizeX = size;
-            SizeY = size;
-        }
-        public InterfaceElement(int x, int y, string name, string path, float sizeX, float sizeY) : base(name, path)
-        {
-            X = x;
-            Y = y;
-            SizeX = sizeX;
-            SizeY = sizeY;
-        }
-        public int X { get; set; } = 0;
-        public int Y { get; set; } = 0;
-        public float SizeX { get; set; } = 1;
-        public float SizeY { get; set; } = 1;
+        public Rectangle Rectangle { get; set; } = Rectangle.Empty;
+
+        public int X { get; set; } = x;
+        public int Y { get; set; } = y;
+        public int Size { get; set; } = size;
         public float Rotation { get; set; } = 0;
+        public bool FoolScreen { get; set; } = foolScreen;
+        public bool IsAButton { get; set; } = isAButton;
+
+        public void Update(MouseState mouse)
+        {
+            Texture2D texture2D = ContentMaster.Textures[TexturesFolderPath][Name];
+
+            if (FoolScreen == false) Rectangle = new(X, Y, Size, (int)(Size * ((float)texture2D.Height / texture2D.Width)));
+
+            bool isInside = Rectangle.Contains(mouse.Position);
+
+            if (IsAButton && isInside)
+            {
+
+            }
+
+            if (IsAButton && isInside && mouse.LeftButton == ButtonState.Pressed)
+            {
+
+            }
+        }
     }
     public class Parameters(float size, float offsetCenterX, float offsetCenterY, float offsetPosX, float offsetPosY, float maxSpeedRotation)
     {
@@ -320,7 +325,36 @@ namespace Factories_And_Guns
     public class Interface
     {
         static public Dictionary<string, Dictionary<string, InterfaceElement>> Templates { get; set; } = [];
-        static public string CurrentTemplate { get; set; } = null;
-        static public InterfaceElement Cursor { get; set; } = new(0, 0, "base", "User_Interface/cursors", 30);
+        static public string[] CurrentTemplate { get; set; } = new string[10];
+        static public int CurrentTemplateIndex { get; set; } = 0;
+        static public InterfaceElement Cursor { get; set; } = new(0, 0, "base", "User_Interface/cursors", 30, false, false);
+        static public Dictionary<string, Keys> Keys { get; set; } = [];
+
+        static public void Update(Keys[] keys, MouseState mouse)
+        {
+            string current = CurrentTemplate[CurrentTemplateIndex];
+            var top = Templates[current].Keys;
+            foreach (string name in top) Templates[current][name].Update(mouse);
+
+            Cursor.Update(mouse);
+
+            var keysList = Keys.Keys;
+            for (int i = 0; i < keys.Length; i++)
+            {
+                foreach (var key in keysList)
+                {
+                    if (keys[i] == Keys[key] && CurrentTemplate[CurrentTemplateIndex] != key && CurrentTemplateIndex < CurrentTemplate.Length)
+                    {
+                        CurrentTemplateIndex += 1;
+                        CurrentTemplate[CurrentTemplateIndex] = key;
+                    }
+                    if (keys[i] == Keys["back"] && CurrentTemplateIndex > 0)
+                    {
+                        CurrentTemplateIndex -= 1;
+                    }
+                    if (keys[i] == Keys["home"]) CurrentTemplateIndex = 0;
+                }
+            }
+        }
     }
 }
