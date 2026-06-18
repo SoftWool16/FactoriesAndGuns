@@ -649,7 +649,7 @@ namespace Factories_And_Guns
                         null,
                         Color.White,
                         element.Rotation,
-                        new(elementT.Height / 2, elementT.Width / 2),
+                        Vector2.Zero,
                         SpriteEffects.None,
                         0
                     );
@@ -679,7 +679,7 @@ namespace Factories_And_Guns
                         null,
                         Color.White,
                         element.Rotation,
-                        new(elementT.Height / 2, elementT.Width / 2),
+                        Vector2.Zero,
                         SpriteEffects.None,
                         0
                     );
@@ -703,7 +703,33 @@ namespace Factories_And_Guns
                 cursor.Rectangle,
                 Color.White
             );
-            
+
+
+            var focus = FocusClass.Focus;
+
+            if (FocusClass.IsFocused)
+            {
+                Texture2D focusT;
+                try
+                {
+                    focusT = ContentMaster.Textures[focus.TexturesFolderPath][focus.Name];
+                }
+                catch
+                {
+                    focusT = ContentMaster.Textures[""]["mistake"];
+                }
+
+                spriteBatch.Draw(
+                            focusT,
+                            focus.Rectangle,
+                            null,
+                            Color.White,
+                            focus.Rotation,
+                            new(focusT.Height / 2, focusT.Width / 2),
+                            SpriteEffects.None,
+                            0
+                        );
+            }
         }
     }
 }

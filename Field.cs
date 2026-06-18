@@ -77,7 +77,7 @@ namespace Factories_And_Guns
             FieldEquipment["ground"] = [];
             FieldEquipment["air"] = [];
 
-            Interface.CurrentTemplate[0] = "surface";
+            //Interface.CurrentTemplate[0] = "surface";
 
             LearningSystem.System = new Object[20, 20];
 
@@ -86,26 +86,6 @@ namespace Factories_And_Guns
                 for (int j = 0; j < 20; j++)
                 {
                     LearningSystem.System[i, j] = null;
-                }
-            }
-
-            LearningSystem.System[10, 10] = new(null, null, null, TypeLearning.opened);
-            LearningSystem.System[9, 10] = new(null, null, null, TypeLearning.closed);
-            LearningSystem.System[8, 10] = new(null, null, null, TypeLearning.locked);
-
-            for (int i = 0; i < 20; i++)
-            {
-                for (int j = 0;j < 20; j++)
-                {
-                    if (LearningSystem.System[i, j] != null)
-                    {
-                        string nameL = "";
-                        var type = LearningSystem.System[i, j].TypeLearning;
-                        if (type == TypeLearning.opened) nameL = "opened";
-                        else if (type == TypeLearning.closed) nameL = "closed";
-                        else if (type == TypeLearning.locked) nameL = "closed";
-                        Interface.Templates["learning"][$"l{i + j}"] = new(70 * i, 70 * j, nameL, $"User_Interface/frame", 50, false, false);
-                    }
                 }
             }
 

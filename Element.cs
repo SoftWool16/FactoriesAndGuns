@@ -11,7 +11,7 @@ namespace Factories_And_Guns
         public string Name { get; set; } = Name;
         public string TexturesFolderPath { get; set; } = texturePath;
     }
-    public class InterfaceElement(int x, int y, string name, string path, int size, bool foolScreen, bool isAButton) : Element(name, path)
+    public class InterfaceElement(int x, int y, string name, string path, int size, bool foolScreen, string interfaceForOpen) : Element(name, path)
     {
         public Rectangle Rectangle { get; set; } = Rectangle.Empty;
 
@@ -20,24 +20,64 @@ namespace Factories_And_Guns
         public int Size { get; set; } = size;
         public float Rotation { get; set; } = 0;
         public bool FoolScreen { get; set; } = foolScreen;
-        public bool IsAButton { get; set; } = isAButton;
+        public string InterfaceForOpen { get; set; } = interfaceForOpen;
 
         public void Update(MouseState mouse)
         {
-            Texture2D texture2D = ContentMaster.Textures[TexturesFolderPath][Name];
+            bool IsNotFalse = false;
 
-            if (FoolScreen == false) Rectangle = new(X, Y, Size, (int)(Size * ((float)texture2D.Height / texture2D.Width)));
-
-            bool isInside = Rectangle.Contains(mouse.Position);
-
-            if (IsAButton && isInside)
+            var list1 = ContentMaster.Textures.Keys;
+            foreach (string Path in list1)
             {
-
+                if (TexturesFolderPath == Path)
+                {
+                    var list2 = ContentMaster.Textures[Path].Keys;
+                    foreach (string Name in list2)
+                    {
+                        if (this.Name == Name) { IsNotFalse = true; break; }
+                    }
+                }
             }
 
-            if (IsAButton && isInside && mouse.LeftButton == ButtonState.Pressed)
+            if (IsNotFalse)
             {
+                Texture2D texture2D = ContentMaster.Textures[TexturesFolderPath][Name];
 
+                if (FoolScreen == false) Rectangle = new(X, Y, Size, (int)(Size * ((float)texture2D.Height / texture2D.Width)));
+            }
+            else
+            {
+                if (FoolScreen == false) Rectangle = new(X, Y, Size, Size);
+            }
+
+            if (InterfaceForOpen != null)
+            {
+                bool isInside = Rectangle.Contains(mouse.Position);
+
+                if (isInside && mouse.LeftButton == ButtonState.Pressed)
+                {
+                    FocusClass.IsFocused = true;
+
+                    FocusClass.Decreasing = true;
+
+                    var list = Interface.Templates.Keys;
+                    foreach (string name in list)
+                    {
+                        if (name == InterfaceForOpen)
+                        {
+                            Interface.CurrentTemplateIndex += 1;
+                            Interface.CurrentTemplate[Interface.CurrentTemplateIndex] = InterfaceForOpen;
+                            break;
+                        }
+                    }
+                }
+
+                else if (isInside)
+                {
+                    FocusClass.IsFocused = true;
+
+                    Interface.MoveFocusAndResize(X + (Rectangle.Width / 2), Y + (Rectangle.Height / 2), Size);
+                }
             }
         }
     }
@@ -322,38 +362,100 @@ namespace Factories_And_Guns
         public Dictionary<string, Element> Elements { get; set; } = null;
     }
 
+    public class FocusClass
+    {
+        static public InterfaceElement Focus { get; set; } = new(0, 0, "focus", "User_Interface", 80, false, null);
+        static public bool IsFocused { get; set; } = false;
+        static public float FocusMoveSpeed { get; set; } = 30;
+        static public float FocusRotationSpeed { get; set; } = 0.07f;
+        static public int MinSize { get; set; } = 40;
+        static public int MaxSize { get; set; } = 200;
+        static public int FocusGrowthSpeed { get; set; } = 20;
+        static public bool Decreasing { get; set; } = false;
+
+        static public void Update(MouseState mouse)
+        {
+            Focus.Update(mouse);
+
+            if (Decreasing)
+            {
+                if (Focus.Size > 0) Focus.Size -= FocusGrowthSpeed;
+                else Decreasing = false;
+            }
+
+            if (Focus.Rotation < 360) Focus.Rotation += FocusRotationSpeed;
+            else Focus.Rotation = 0;
+        }
+    }
+
     public class Interface
     {
         static public Dictionary<string, Dictionary<string, InterfaceElement>> Templates { get; set; } = [];
         static public string[] CurrentTemplate { get; set; } = new string[10];
         static public int CurrentTemplateIndex { get; set; } = 0;
-        static public InterfaceElement Cursor { get; set; } = new(0, 0, "base", "User_Interface/cursors", 30, false, false);
+        static public InterfaceElement Cursor { get; set; } = new(0, 0, "base", "User_Interface/cursors", 30, false, null);
+        
         static public Dictionary<string, Keys> Keys { get; set; } = [];
 
         static public void Update(Keys[] keys, MouseState mouse)
         {
+            FocusClass.IsFocused = false;
+
             string current = CurrentTemplate[CurrentTemplateIndex];
             var top = Templates[current].Keys;
             foreach (string name in top) Templates[current][name].Update(mouse);
 
             Cursor.Update(mouse);
+            FocusClass.Update(mouse);
 
             var keysList = Keys.Keys;
             for (int i = 0; i < keys.Length; i++)
             {
                 foreach (var key in keysList)
                 {
-                    if (keys[i] == Keys[key] && CurrentTemplate[CurrentTemplateIndex] != key && CurrentTemplateIndex < CurrentTemplate.Length)
+                    if (keys[i] == Keys[key] && 
+                        CurrentTemplate[CurrentTemplateIndex] != key && 
+                        CurrentTemplateIndex < CurrentTemplate.Length)
                     {
                         CurrentTemplateIndex += 1;
                         CurrentTemplate[CurrentTemplateIndex] = key;
                     }
+
                     if (keys[i] == Keys["back"] && CurrentTemplateIndex > 0)
                     {
                         CurrentTemplateIndex -= 1;
                     }
+
                     if (keys[i] == Keys["home"]) CurrentTemplateIndex = 0;
                 }
+            }
+        }
+
+        static public void MoveFocusAndResize(int x, int y, int Size)
+        {
+            int X = x - FocusClass.Focus.X;
+            int Y = y - FocusClass.Focus.Y;
+
+            Vector2 vector2 = new(X, Y);
+
+            vector2 = Vector2.Normalize(vector2);
+
+            if (FocusClass.Focus.X != x || FocusClass.Focus.Y != y)
+            {
+                float focusMoveSpeed = FocusClass.FocusMoveSpeed;
+                if (FocusClass.Focus.X + (int)(vector2.X * focusMoveSpeed) > x &&
+                    FocusClass.Focus.X - (int)(vector2.X * focusMoveSpeed) < x) FocusClass.Focus.X = x;
+                else FocusClass.Focus.X += (int)(vector2.X * focusMoveSpeed);
+
+                if (FocusClass.Focus.Y + (int)(vector2.Y * focusMoveSpeed) > y &&
+                    FocusClass.Focus.Y - (int)(vector2.Y * focusMoveSpeed) < y) FocusClass.Focus.Y = y;
+                else FocusClass.Focus.Y += (int)(vector2.Y * focusMoveSpeed);
+            }
+
+            if (!FocusClass.Decreasing)
+            {
+                if (FocusClass.Focus.Size < Size * 2 && FocusClass.Focus.Size < FocusClass.MaxSize) FocusClass.Focus.Size += FocusClass.FocusGrowthSpeed;
+                else if (FocusClass.Focus.Size > Size * 2 && FocusClass.Focus.Size > FocusClass.MinSize) FocusClass.Focus.Size -= FocusClass.FocusGrowthSpeed;
             }
         }
     }

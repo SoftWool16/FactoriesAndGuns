@@ -36,7 +36,15 @@ namespace Factories_And_Guns
             Interface.Templates["learning"] = [];
             Interface.Templates["settings"] = [];
 
-            Interface.Templates["learning"]["background"] = new(0, 0, "background", "User_Interface", 1, true, false);
+            Interface.Templates["Sun system"] = [];
+            Interface.Templates["Planet fields"] = [];
+
+            Interface.Templates["Sun system"]["1"] = new(500, 500, "у", "d", 500, false, "Planet fields");
+            Interface.Templates["Planet fields"]["1"] = new(500, 500, "w", "f", 300, false, "");
+
+            Interface.CurrentTemplate[0] = "Sun system";
+
+            Interface.Templates["learning"]["background"] = new(0, 0, "background", "User_Interface", 1, true, null);
 
             Interface.Keys["learning"] = Keys.I;
             Interface.Keys["back"] = Keys.Back;
@@ -65,6 +73,26 @@ namespace Factories_And_Guns
             General.SunSystems["A New Beginning"] = new("A New Beginning");
             General.SunSystems["A New Beginning"].Planets["New planet"] = new(0, null, 100);
             General.SunSystems["A New Beginning"].Planets["New planet"].Fields["New field"] = new("", 100, 100, Difficulty.Medium);
+
+            LearningSystem.System[10, 10] = new(null, null, null, TypeLearning.opened);
+            LearningSystem.System[9, 10] = new(null, null, null, TypeLearning.closed);
+            LearningSystem.System[8, 10] = new(null, null, null, TypeLearning.locked);
+
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; j < 20; j++)
+                {
+                    if (LearningSystem.System[i, j] != null)
+                    {
+                        string nameL = "";
+                        var type = LearningSystem.System[i, j].TypeLearning;
+                        if (type == TypeLearning.opened) nameL = "opened";
+                        else if (type == TypeLearning.closed) nameL = "closed";
+                        else if (type == TypeLearning.locked) nameL = "closed";
+                        Interface.Templates["learning"][$"l{i + j}"] = new(70 * i, 70 * j, nameL, $"User_Interface/frame", 50, false, "");
+                    }
+                }
+            }
         }
 
         protected override void Update(GameTime gameTime)
